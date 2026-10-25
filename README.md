@@ -21,6 +21,8 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -r requirements.txt
 python -m src.data.nhanes --download                 # downloads XPT files from CDC
 python scripts/run_experiment.py --config configs/config.yaml
+# temporal test: tune on 2011-2016, score once on 2017-2018 (reports/temporal_test.csv)
+python scripts/run_experiment.py --mode temporal --models xgboost --strategies none
 ```
 
 Results (metrics CSV, plots) are written to `reports/`.
