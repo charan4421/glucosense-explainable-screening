@@ -1,0 +1,33 @@
+seed: 42
+
+data:
+  nhanes_cycles: ["2011-2012", "2013-2014", "2015-2016", "2017-2018"]
+  raw_dir: data/raw
+  processed_path: data/processed/nhanes.parquet
+  temporal_test_cycle: "2017-2018"   # train on earlier cycles, test on this one
+
+features:
+  numeric: [age, bmi, waist_cm, systolic_bp, diastolic_bp, height_cm]
+  categorical: [sex, family_history_diabetes, smoker, race_eth]
+  interactions: true                  # age*bmi, waist/height, bmi/age, etc.
+
+preprocessing:
+  knn_neighbors: 5
+  scaler: robust
+
+imbalance:
+  strategies: [none, class_weight, smotenc]
+
+cv:
+  outer_folds: 5
+  inner_folds: 3
+  n_iter: 15
+  scoring: average_precision          # PR-AUC
+
+models: [xgboost, mlp, tabnet]
+
+explain:
+  shap_sample: 2000
+  lime_samples: 5
+  dice_total_cfs: 3
+  immutable: [age, sex, height_cm, race_eth, family_history_diabetes]
