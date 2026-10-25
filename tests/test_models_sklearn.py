@@ -4,12 +4,19 @@ import pytest
 from sklearn.base import is_classifier
 from sklearn.metrics import get_scorer
 
-from src.models.models import get_model
+from src.models.models import XGB, TabNetWrapper, TorchMLP, get_model
 from src.preprocessing.pipeline import build_model_pipeline
 from tests.test_pipeline import CAT, make_data
 
 FAST = {"mlp": {"model__epochs": 2}, "tabnet": {"model__max_epochs": 2, "model__patience": 1},
         "xgboost": {"model__n_estimators": 20}}
+
+
+@pytest.mark.parametrize("cls", [XGB, TorchMLP, TabNetWrapper])
+def test_wrapper_is_classifier(cls):
+    # Fast guard, no fitting: with BaseEstimator before ClassifierMixin this is False
+    # under sklearn >= 1.6 and every scorer call in CV fails.
+    assert is_classifier(cls()), f"{cls.__name__}: put ClassifierMixin before BaseEstimator"
 
 
 @pytest.mark.parametrize("name", ["xgboost", "mlp", "tabnet"])
