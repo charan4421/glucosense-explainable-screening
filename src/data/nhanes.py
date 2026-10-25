@@ -21,12 +21,20 @@ CYCLES = {
 }
 # CDC file stems per component; the cycle letter is appended.
 FILES = ["DEMO", "BMX", "BPX", "DIQ", "MCQ", "SMQ", "GHB", "GLU"]
-BASE = "https://wwwn.cdc.gov/Nchs/Nhanes/{start}-{end}/{stem}_{letter}.XPT"
+# CDC moved the files in 2024; the old /Nchs/Nhanes/{start}-{end}/{stem}_{letter}.XPT path now
+# returns an HTML page with status 200, so a bad URL is only detectable from the content.
+BASE = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/{start}/DataFiles/{stem}_{letter}.xpt"
+XPT_MAGIC = b"HEADER RECORD*******LIBRARY HEADER RECORD"
 
 
 def _url(cycle: str, stem: str) -> str:
-    start, end = cycle.split("-")
-    return BASE.format(start=start, end=end, stem=stem, letter=CYCLES[cycle])
+    start, _ = cycle.split("-")
+    return BASE.format(start=start, stem=stem, letter=CYCLES[cycle])
+
+
+def _is_xpt(path: Path) -> bool:
+    with open(path, "rb") as f:
+        return f.read(len(XPT_MAGIC)) == XPT_MAGIC
 
 
 def download(raw_dir: str | Path, cycles: list[str]) -> None:
@@ -35,12 +43,15 @@ def download(raw_dir: str | Path, cycles: list[str]) -> None:
     for cycle in cycles:
         for stem in FILES:
             out = raw_dir / f"{stem}_{CYCLES[cycle]}.XPT"
-            if out.exists():
+            if out.exists() and _is_xpt(out):
                 continue
-            r = requests.get(_url(cycle, stem), timeout=60)
+            url = _url(cycle, stem)
+            r = requests.get(url, timeout=120)
             r.raise_for_status()
+            if not r.content.startswith(XPT_MAGIC):
+                raise RuntimeError(f"{url} did not return a SAS XPT file (got {r.content[:40]!r})")
             out.write_bytes(r.content)
-            print("downloaded", out.name)
+            print("downloaded", out.name, f"{len(r.content) / 1e6:.1f} MB")
 
 
 def _read(raw_dir: Path, stem: str, letter: str) -> pd.DataFrame:
