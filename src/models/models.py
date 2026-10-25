@@ -40,7 +40,9 @@ XGB_SPACE = {
 }
 
 
-class TorchMLP(BaseEstimator, ClassifierMixin):
+# Mixin before BaseEstimator: sklearn >= 1.6 reads estimator tags along the MRO, and with
+# BaseEstimator first is_classifier() is False, so scorers pass both proba columns and fail.
+class TorchMLP(ClassifierMixin, BaseEstimator):
     """Plain PyTorch MLP baseline with sklearn API."""
 
     def __init__(self, hidden=(128, 64), dropout=0.2, lr=1e-3, epochs=30, batch_size=512,
@@ -102,7 +104,7 @@ MLP_SPACE = {
 }
 
 
-class TabNetWrapper(BaseEstimator, ClassifierMixin):
+class TabNetWrapper(ClassifierMixin, BaseEstimator):
     """sklearn-style wrapper around pytorch-tabnet. Holds out 10% of the training fold for early stopping."""
 
     def __init__(self, n_d=16, n_a=16, n_steps=4, lr=2e-2, max_epochs=60, patience=10,
