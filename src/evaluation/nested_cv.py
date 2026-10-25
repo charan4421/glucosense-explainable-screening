@@ -4,11 +4,13 @@ Every fold fits the whole pipeline (imputation, scaling, SMOTE-NC, model) on tra
 """
 from __future__ import annotations
 
+import time
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 
-from src.evaluation.metrics import summarize
+from src.evaluation.metrics import calibration_stats, summarize
 from src.models.models import get_model
 from src.preprocessing.pipeline import build_model_pipeline
 
@@ -35,9 +37,16 @@ def nested_cv(X: pd.DataFrame, y, model_name: str, strategy: str, categorical: l
                                     knn_neighbors, interactions, seed)
         search = RandomizedSearchCV(pipe, space, n_iter=n_iter, cv=inner, scoring=scoring,
                                     random_state=seed, n_jobs=1, refit=True)
+        t0 = time.perf_counter()
         search.fit(X.iloc[tr], y[tr])
         p = search.predict_proba(X.iloc[te])[:, 1]
         oof[te] = p
-        rows.append({"model": model_name, "strategy": strategy, "fold": k,
-                     "best_params": str(search.best_params_), **summarize(y[te], p)})
+        cal = calibration_stats(y[te], p)          # on this outer fold's predictions only
+        rows.append({"model": model_name, "strategy": strategy, "fold": k, "n_iter": n_iter,
+                     "best_params": str(search.best_params_), **summarize(y[te], p),
+                     "citl_mean_predicted": cal["citl_mean_predicted"],
+                     "citl_difference": cal["citl_difference"],
+                     "citl_ratio_observed_expected": cal["citl_ratio_observed_expected"],
+                     "calibration_slope": cal["slope"],
+                     "fit_seconds": time.perf_counter() - t0})
     return pd.DataFrame(rows), oof

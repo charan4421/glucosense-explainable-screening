@@ -28,7 +28,7 @@ from src.evaluation.metrics import (  # noqa: E402
     plot_calibration,
 )
 from src.evaluation.nested_cv import nested_cv  # noqa: E402
-from src.evaluation.temporal import feature_columns, temporal_evaluate  # noqa: E402
+from src.evaluation.temporal import feature_columns, temporal_evaluate, temporal_split  # noqa: E402
 
 TARGET = MAIN_LABEL
 
@@ -78,36 +78,53 @@ def run_temporal(cfg: dict, models: list[str], strategies: list[str],
     return res
 
 
-def main(cfg_path: str, models: list[str] | None = None, strategies: list[str] | None = None) -> None:
-    cfg = yaml.safe_load(open(cfg_path))
-    out = Path("reports")
-    out.mkdir(exist_ok=True)
+SUMMARY_METRICS = ["pr_auc", "roc_auc", "brier", "citl_difference", "citl_ratio_observed_expected",
+                   "calibration_slope", "prevalence", "fit_seconds"]
 
-    df = pd.read_parquet(cfg["data"]["processed_path"])
+
+def main(cfg_path: str, models: list[str] | None = None, strategies: list[str] | None = None,
+         n_iter: int | None = None) -> None:
+    """Nested CV on the development cycles only: the temporal test cycle is removed first."""
+    cfg = yaml.safe_load(open(cfg_path))
+    out, res_dir = Path("reports"), Path("results")
+    out.mkdir(exist_ok=True)
+    res_dir.mkdir(exist_ok=True)
+
+    test_cycle = cfg["data"]["temporal_test_cycle"]
+    dev, _ = temporal_split(pd.read_parquet(cfg["data"]["processed_path"]), test_cycle)
+    assert test_cycle not in set(dev.cycle), "test cycle leaked into nested CV"
+    print(f"nested CV on {sorted(dev.cycle.unique())} (n={len(dev)}); {test_cycle} held out")
     feats = feature_columns(cfg)
-    X, y = df[feats], df[TARGET]
+    X, y = dev[feats].reset_index(drop=True), dev[TARGET].reset_index(drop=True)
     cat = cfg["features"]["categorical"]
     cv = cfg["cv"]
+    n_iter = n_iter or cv["n_iter"]
 
     all_rows, oof_store = [], {}
     for model in models or cfg["models"]:
         for strategy in strategies or cfg["imbalance"]["strategies"]:
             if model == "tabnet" and strategy == "class_weight":
                 continue
-            print(f"== {model} / {strategy}")
+            print(f"== {model} / {strategy}  (outer {cv['outer_folds']}, inner {cv['inner_folds']}, "
+                  f"n_iter {n_iter})", flush=True)
             res, oof = nested_cv(
-                X, y, model, strategy, cat, cv["outer_folds"], cv["inner_folds"], cv["n_iter"],
+                X, y, model, strategy, cat, cv["outer_folds"], cv["inner_folds"], n_iter,
                 cv["scoring"], cfg["preprocessing"]["knn_neighbors"],
                 cfg["features"]["interactions"], cfg["seed"])
+            print(f"   {res.fit_seconds.sum():.0f}s  PR-AUC {res.pr_auc.mean():.4f}", flush=True)
             all_rows.append(res)
             oof_store[(model, strategy)] = oof
 
     results = pd.concat(all_rows, ignore_index=True)
     results.to_csv(out / "nested_cv_folds.csv", index=False)
-    summary = (results.groupby(["model", "strategy"])[["pr_auc", "roc_auc", "brier"]]
-               .agg(["mean", "std"]).round(4))
+    summary = results.groupby(["model", "strategy"])[SUMMARY_METRICS].agg(["mean", "std"])
+    summary[("fit_seconds", "total")] = results.groupby(["model", "strategy"]).fit_seconds.sum()
     summary.to_csv(out / "nested_cv_summary.csv")
-    print(summary)
+    tag = f"niter{n_iter}"
+    results.to_csv(res_dir / f"nested_cv_folds_{tag}.csv", index=False)
+    summary.round(4).to_csv(res_dir / f"nested_cv_summary_{tag}.csv")
+    with pd.option_context("display.width", 200, "display.max_columns", 30):
+        print(summary.round(4))
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.5))
     for (model, strategy), oof in oof_store.items():
@@ -135,6 +152,7 @@ if __name__ == "__main__":
     ap.add_argument("--mode", choices=["nested", "temporal"], default="nested")
     ap.add_argument("--models", help="comma list, overrides config (e.g. xgboost)")
     ap.add_argument("--strategies", help="comma list, overrides config (e.g. none)")
+    ap.add_argument("--n-iter", type=int, help="random-search iterations, overrides config")
     a = ap.parse_args()
     models = a.models.split(",") if a.models else None
     strategies = a.strategies.split(",") if a.strategies else None
@@ -142,4 +160,4 @@ if __name__ == "__main__":
         cfg = yaml.safe_load(open(a.config))
         run_temporal(cfg, models or cfg["models"], strategies or cfg["imbalance"]["strategies"])
     else:
-        main(a.config, models, strategies)
+        main(a.config, models, strategies, a.n_iter)
