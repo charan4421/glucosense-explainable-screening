@@ -2,7 +2,11 @@
 
 Calibrated, explainable screening for **undiagnosed diabetes** from non-laboratory features.
 
-- **Main data:** NHANES (multi-cycle). Label = undiagnosed diabetes (HbA1c >= 6.5 or fasting glucose >= 126 mg/dL in people with no self-reported diagnosis). Lab values are used only to build the label, never as features.
+- **Main data:** NHANES 2011-2018 (4 cycles). Lab values and survey weights are used only to build labels and prevalence estimates, never as features.
+  - **Analysis sample:** adults >= 20 y with HbA1c measured and no self-reported diagnosis (DIQ010 not 1). Excluded: refused/don't know on DIQ010 (7, 9) and anyone taking insulin (DIQ050) or diabetes pills (DIQ070) without a diagnosis. Borderline (DIQ010 = 3) is kept.
+  - **Main label** `undiagnosed_diabetes`: HbA1c >= 6.5 %.
+  - **Sensitivity label** `undiagnosed_diabetes_a1c_or_fpg` (sensitivity analysis only): HbA1c >= 6.5 % or fasting plasma glucose >= 126 mg/dL, defined only for the fasting subsample (missing otherwise).
+  - **Prevalence** is reported unweighted and survey-weighted, per cycle and pooled: WTMEC2YR for the main label, WTSAF2YR for the sensitivity label, each divided by the number of cycles when pooling. Current build: main label 3.3 % unweighted / 2.1 % weighted (pooled, n = 17,493).
 - **External validation:** BRFSS (overlapping features only).
 - **Validation design:** nested 5-fold CV, plus temporal split (train on earlier NHANES cycles, test on the latest).
 - **Models:** XGBoost, PyTorch MLP, TabNet.
