@@ -37,8 +37,11 @@ def temporal_split(df: pd.DataFrame, test_cycle: str) -> tuple[pd.DataFrame, pd.
 
 
 def temporal_evaluate(df: pd.DataFrame, feats: list[str], categorical: list[str], target: str,
-                      test_cycle: str, model_name: str, strategy: str, cfg: dict) -> dict:
-    """Tune with inner CV on the training cycles only, then score once on the test cycle."""
+                      test_cycle: str, model_name: str, strategy: str,
+                      cfg: dict) -> tuple[dict, pd.DataFrame]:
+    """Tune with inner CV on the training cycles only, then score once on the test cycle.
+
+    Returns (metrics row, test predictions with columns y_true and p)."""
     train, test = temporal_split(df, test_cycle)
     seed, cv = cfg["seed"], cfg["cv"]
     model, space = get_model(model_name, seed)
@@ -51,9 +54,11 @@ def temporal_evaluate(df: pd.DataFrame, feats: list[str], categorical: list[str]
     search.fit(train[feats], train[target])
     p = search.predict_proba(test[feats])[:, 1]
     m = summarize(test[target], p)
-    return {"model": model_name, "strategy": strategy, "test_cycle": test_cycle,
-            "train_cycles": ",".join(sorted(train.cycle.unique())),
-            "n_train": len(train), "n_test": len(test),
-            "train_prevalence": float(np.mean(train[target])),
-            "test_prevalence": m.pop("prevalence"), **m,
-            "best_params": str(search.best_params_)}
+    row = {"model": model_name, "strategy": strategy, "test_cycle": test_cycle,
+           "train_cycles": ",".join(sorted(train.cycle.unique())),
+           "n_train": len(train), "n_test": len(test),
+           "train_prevalence": float(np.mean(train[target])),
+           "test_prevalence": m.pop("prevalence"), **m,
+           "best_params": str(search.best_params_)}
+    preds = pd.DataFrame({"y_true": test[target].to_numpy(), "p": p}, index=test.index)
+    return row, preds

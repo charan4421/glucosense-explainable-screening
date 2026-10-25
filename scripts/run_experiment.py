@@ -20,14 +20,25 @@ import pandas as pd  # noqa: E402
 import yaml  # noqa: E402
 
 from src.data.nhanes import MAIN_LABEL  # noqa: E402
-from src.evaluation.metrics import calibration_table, decision_curve  # noqa: E402
+from src.evaluation.metrics import (  # noqa: E402
+    bootstrap_ci,
+    calibration_stats,
+    calibration_table,
+    decision_curve,
+    plot_calibration,
+)
 from src.evaluation.nested_cv import nested_cv  # noqa: E402
 from src.evaluation.temporal import feature_columns, temporal_evaluate  # noqa: E402
 
 TARGET = MAIN_LABEL
 
 
-def run_temporal(cfg: dict, models: list[str], strategies: list[str]) -> pd.DataFrame:
+def run_temporal(cfg: dict, models: list[str], strategies: list[str],
+                 n_boot: int = 1000) -> pd.DataFrame:
+    """Temporal test per model/strategy: metrics with bootstrap CIs, calibration stats and plot.
+
+    Writes reports/temporal_test.csv (one row per run), temporal_predictions_<run>.csv and
+    temporal_calibration_<run>.png."""
     out = Path("reports")
     out.mkdir(exist_ok=True)
     df = pd.read_parquet(cfg["data"]["processed_path"])
@@ -36,17 +47,34 @@ def run_temporal(cfg: dict, models: list[str], strategies: list[str]) -> pd.Data
     rows = []
     for model in models:
         for strategy in strategies:
+            run = f"{model}_{strategy}"
             print(f"== temporal {model} / {strategy}: test {test_cycle}")
-            rows.append(temporal_evaluate(df, feats, cat, TARGET, test_cycle, model, strategy, cfg))
+            row, preds = temporal_evaluate(df, feats, cat, TARGET, test_cycle, model, strategy, cfg)
+            y, p = preds.y_true.to_numpy(), preds.p.to_numpy()
+            row.update(bootstrap_ci(y, p, n_boot=n_boot, seed=cfg["seed"]))
+            row.update(calibration_stats(y, p))
+            preds.to_csv(out / f"temporal_predictions_{run}.csv", index_label="row")
+            plot_calibration(y, p, out / f"temporal_calibration_{run}.png", n_bins=10,
+                             title=f"{model}/{strategy}: test {test_cycle} (n={len(y)})")
+            rows.append(row)
     res = pd.DataFrame(rows)
     res.to_csv(out / "temporal_test.csv", index=False)
-    cols = ["model", "strategy", "n_train", "n_test", "train_prevalence", "test_prevalence",
-            "pr_auc", "roc_auc", "brier"]
-    with pd.option_context("display.width", 160):
-        print(res[cols].round(4).to_string(index=False))
-    for r in rows:   # PR-AUC is only meaningful against the base rate it has to beat
-        print(f"{r['model']}/{r['strategy']}: PR-AUC {r['pr_auc']:.4f} vs test prevalence "
-              f"{r['test_prevalence']:.4f} ({r['pr_auc'] / r['test_prevalence']:.1f}x the base rate)")
+    for r in rows:
+        print(f"\n{r['model']}/{r['strategy']}  test {r['test_cycle']}  n={r['n_test']}  "
+              f"(bootstrap {r['n_boot']} resamples, 95% CI)")
+        # PR-AUC is only meaningful against the base rate it has to beat
+        print(f"  PR-AUC  {r['pr_auc']:.4f} [{r['pr_auc_ci_low']:.4f}, {r['pr_auc_ci_high']:.4f}]"
+              f"   test prevalence {r['test_prevalence']:.4f} "
+              f"({r['pr_auc'] / r['test_prevalence']:.1f}x base rate)")
+        print(f"  ROC-AUC {r['roc_auc']:.4f} [{r['roc_auc_ci_low']:.4f}, {r['roc_auc_ci_high']:.4f}]")
+        print(f"  Brier   {r['brier']:.4f} [{r['brier_ci_low']:.4f}, {r['brier_ci_high']:.4f}]"
+              f"   (always-predict-prevalence: "
+              f"{r['test_prevalence'] * (1 - r['test_prevalence']):.4f})")
+        print(f"  calibration-in-the-large: mean predicted {r['citl_mean_predicted']:.4f} vs "
+              f"observed {r['citl_observed']:.4f} (O/E {r['citl_ratio_observed_expected']:.2f})")
+        print(f"  calibration slope {r['slope']:.3f}, intercept {r['intercept']:.3f} "
+              f"(logistic regression on logit p); intercept with slope fixed at 1: "
+              f"{r['intercept_offset']:.3f}")
     return res
 
 
