@@ -1,7 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
-data/
+/data/
 reports/
 .ipynb_checkpoints/
 .pytest_cache/
