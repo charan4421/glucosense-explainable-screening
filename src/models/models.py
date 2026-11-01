@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 
 
@@ -142,7 +143,19 @@ TABNET_SPACE = {
 }
 
 
+LOGREG_SPACE = {"model__C": [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 100.0]}
+
+# Models that take the raw feature frame and have nothing to tune (no preprocessing, no search).
+RAW_INPUT_MODELS = {"ada_style"}
+
+
 def get_model(name: str, seed: int = 42):
+    if name == "logreg":
+        # L2 is the default penalty; C is tuned. Same preprocessing pipeline as the other models.
+        return LogisticRegression(max_iter=2000, random_state=seed), LOGREG_SPACE
+    if name == "ada_style":
+        from src.models.ada_style import ADAStyleScore
+        return ADAStyleScore(), {}
     if name == "xgboost":
         return make_xgb(seed), XGB_SPACE
     if name == "mlp":

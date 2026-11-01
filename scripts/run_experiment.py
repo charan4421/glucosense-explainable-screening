@@ -39,6 +39,7 @@ from src.evaluation.metrics import (  # noqa: E402
 )
 from src.evaluation.nested_cv import nested_cv  # noqa: E402
 from src.evaluation.temporal import feature_columns, temporal_evaluate, temporal_split  # noqa: E402
+from src.models.models import RAW_INPUT_MODELS  # noqa: E402
 
 TARGET = MAIN_LABEL
 
@@ -116,7 +117,8 @@ def main(cfg_path: str, models: list[str] | None = None, strategies: list[str] |
 
     combos = [(m, s) for m in models or cfg["models"]
               for s in strategies or cfg["imbalance"]["strategies"]
-              if not (m == "tabnet" and s == "class_weight")]
+              if not (m == "tabnet" and s == "class_weight")
+              and not (m in RAW_INPUT_MODELS and s != "none")]   # fixed score: no strategies
     oof_store, t_start = {}, time.perf_counter()
     for i, (model, strategy) in enumerate(combos, 1):
         path = combo_path(DEV_CV_DIR, model, strategy)

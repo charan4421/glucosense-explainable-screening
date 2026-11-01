@@ -11,7 +11,7 @@ import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 
 from src.evaluation.metrics import calibration_stats, summarize
-from src.models.models import get_model
+from src.models.models import RAW_INPUT_MODELS, get_model
 from src.preprocessing.pipeline import build_model_pipeline
 
 
@@ -33,17 +33,22 @@ def nested_cv(X: pd.DataFrame, y, model_name: str, strategy: str, categorical: l
             strategy_here = strategy
         if model_name == "mlp" and strategy == "class_weight":
             model.set_params(pos_weight="auto")
-        pipe = build_model_pipeline(X.iloc[tr], model, categorical, strategy_here,
-                                    knn_neighbors, interactions, seed)
-        search = RandomizedSearchCV(pipe, space, n_iter=n_iter, cv=inner, scoring=scoring,
-                                    random_state=seed, n_jobs=1, refit=True)
         t0 = time.perf_counter()
-        search.fit(X.iloc[tr], y[tr])
+        if model_name in RAW_INPUT_MODELS:            # fixed score: fit its mapping, no search
+            search = model.fit(X.iloc[tr], y[tr])
+            best_params = {}
+        else:
+            pipe = build_model_pipeline(X.iloc[tr], model, categorical, strategy_here,
+                                        knn_neighbors, interactions, seed)
+            search = RandomizedSearchCV(pipe, space, n_iter=n_iter, cv=inner, scoring=scoring,
+                                        random_state=seed, n_jobs=1, refit=True)
+            search.fit(X.iloc[tr], y[tr])
+            best_params = search.best_params_
         p = search.predict_proba(X.iloc[te])[:, 1]
         oof[te] = p
         cal = calibration_stats(y[te], p)          # on this outer fold's predictions only
         rows.append({"model": model_name, "strategy": strategy, "fold": k, "n_iter": n_iter,
-                     "best_params": str(search.best_params_), **summarize(y[te], p),
+                     "best_params": str(best_params), **summarize(y[te], p),
                      "citl_mean_predicted": cal["citl_mean_predicted"],
                      "citl_difference": cal["citl_difference"],
                      "citl_ratio_observed_expected": cal["citl_ratio_observed_expected"],

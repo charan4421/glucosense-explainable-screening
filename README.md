@@ -10,6 +10,10 @@ Calibrated, explainable screening for **undiagnosed diabetes** from non-laborato
 - **External validation:** BRFSS (overlapping features only).
 - **Validation design:** nested 5-fold CV, plus temporal split (train on earlier NHANES cycles, test on the latest).
 - **Models:** XGBoost, PyTorch MLP, TabNet.
+- **Baselines** (same nested-CV folds and preprocessing): L2 logistic regression with tuned C, and an **ADA-style** risk score. The ADA-style score approximates the ADA Type 2 Diabetes Risk Test with the columns available; it is not the official score.
+  - Included: age, sex, family history (MCQ300C, any close relative), BMI (official cut-offs), and high blood pressure as a **proxy** (measured SBP >= 140 or DBP >= 90; the official item is a diagnosis or medication).
+  - Missing (scored 0): physical activity and gestational diabetes. Maximum 9 of the official 11 points; a missing value scores 0.
+  - Points are mapped to risk by a one-variable logistic regression fit on each training fold.
 - **Imbalance strategies compared:** none, class weighting, SMOTE-NC (always applied inside CV folds).
 - **Metrics:** PR-AUC (primary), ROC-AUC, Brier score, calibration curve, Decision Curve Analysis.
 - **Explainability:** SHAP (global + local), LIME consistency check, DiCE counterfactuals with immutable features.
@@ -23,6 +27,7 @@ python -m src.data.nhanes --download                 # downloads XPT files from 
 # nested CV on 2011-2016 only; each model/strategy is checkpointed to results/dev_cv/ and
 # skipped on restart if config + seed + n_iter are unchanged
 python scripts/run_experiment.py --config configs/config.yaml --n-iter 5
+python scripts/run_experiment.py --models logreg,ada_style --strategies none --n-iter 5   # baselines
 python scripts/summarize_dev_cv.py                   # rebuild results/dev_cv_summary.csv any time
 # temporal test: tune on 2011-2016, score once on 2017-2018 (reports/temporal_test.csv)
 python scripts/run_experiment.py --mode temporal --models xgboost --strategies none
