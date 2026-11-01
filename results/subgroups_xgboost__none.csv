@@ -1,0 +1,10 @@
+variable,group,n,n_pos,prevalence,reliable,note,pr_auc,roc_auc,calibration_slope,observed_expected
+overall,all,13355,411,0.0308,True,,0.0820,0.7897,0.9763,1.0035
+sex,male,6402,215,0.0336,True,,0.0893,0.7875,0.9427,1.0867
+sex,female,6953,196,0.0282,True,,0.0764,0.7928,1.0110,0.9257
+race_eth,Non-Hispanic White,5231,94,0.0180,True,,0.0700,0.8046,1.2040,0.7618
+race_eth,Non-Hispanic Asian,1695,66,0.0389,True,,0.0980,0.7677,0.7997,1.3104
+race_eth,Non-Hispanic Black,2828,116,0.0410,True,,0.0899,0.7671,0.8988,1.0582
+race_eth,Mexican American,1753,72,0.0411,True,,0.0996,0.7838,0.9729,1.1219
+race_eth,Other Hispanic,1420,53,0.0373,True,,0.0731,0.7395,0.7955,1.1422
+race_eth,Other / multiracial,428,10,0.0234,False,fewer than 30 positives: not reliable,0.0959,0.8089,1.0782,0.6400
