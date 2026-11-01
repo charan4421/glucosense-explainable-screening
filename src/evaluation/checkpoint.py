@@ -23,8 +23,22 @@ def run_hash(cfg: dict, seed: int, n_iter: int) -> str:
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
-def combo_path(out_dir: Path, model: str, strategy: str) -> Path:
-    return Path(out_dir) / f"{model}__{strategy}.csv"
+def combo_hash(cfg: dict, feats: list[str], categorical: list[str], n_iter: int,
+               data_path: str | Path) -> str:
+    """Hash of everything that changes one combination's result: data file content, sample/CV/
+    preprocessing settings, the resolved feature list, seed and n_iter. Unlike run_hash it does
+    not depend on unrelated config (other sets, the design list), so adding work elsewhere
+    never invalidates finished combinations."""
+    digest = hashlib.sha256(Path(data_path).read_bytes()).hexdigest()
+    relevant = {"data_sha256": digest, "cv": cfg["cv"], "preprocessing": cfg["preprocessing"],
+                "interactions": cfg["features"]["interactions"], "features": list(feats),
+                "categorical": list(categorical)}
+    return run_hash(relevant, cfg["seed"], n_iter)
+
+
+def combo_path(out_dir: Path, model: str, strategy: str, feature_set: str | None = None) -> Path:
+    name = f"{model}__{strategy}" + (f"__{feature_set}" if feature_set else "")
+    return Path(out_dir) / f"{name}.csv"
 
 
 def is_done(path: Path, h: str) -> bool:
@@ -65,7 +79,8 @@ def build_summary(in_dir: Path, out_path: Path) -> pd.DataFrame:
     if not files:
         raise FileNotFoundError(f"no combination files in {in_dir}")
     folds = pd.concat([pd.read_csv(f, dtype={"run_hash": str}) for f in files], ignore_index=True)
-    g = folds.groupby(["model", "strategy"], sort=False)
+    keys = [k for k in ("feature_set", "model", "strategy") if k in folds]
+    g = folds.groupby(keys, sort=False)
     stats = g[FOLD_COLUMNS].agg(["mean", "std"])
     stats.columns = [f"{c}_{'sd' if s == 'std' else s}" for c, s in stats.columns]
     meta = g.agg(n_folds=("fold", "size"), n_iter=("n_iter", "first"),

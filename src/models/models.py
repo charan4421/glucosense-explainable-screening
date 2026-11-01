@@ -149,7 +149,20 @@ LOGREG_SPACE = {"model__C": [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0,
 RAW_INPUT_MODELS = {"ada_style"}
 
 
+# EBM: 8 outer bags (default 14) on 4 parallel jobs to fit this PC; the number of pairwise
+# interactions is tuned because it dominates fit time (0 interactions ~4 s, 3x default ~1 min).
+EBM_SPACE = {
+    "model__interactions": [0, 5, 10],
+    "model__learning_rate": [0.005, 0.015, 0.05],
+    "model__max_leaves": [2, 3],
+    "model__min_samples_leaf": [2, 4, 10],
+}
+
+
 def get_model(name: str, seed: int = 42):
+    if name == "ebm":
+        from interpret.glassbox import ExplainableBoostingClassifier
+        return ExplainableBoostingClassifier(outer_bags=8, n_jobs=4, random_state=seed), EBM_SPACE
     if name == "logreg":
         # L2 is the default penalty; C is tuned. Same preprocessing pipeline as the other models.
         return LogisticRegression(max_iter=2000, random_state=seed), LOGREG_SPACE

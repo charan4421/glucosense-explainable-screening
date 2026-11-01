@@ -1,6 +1,7 @@
 """Every model must behave as an sklearn classifier, or CV scorers silently fail on it."""
 import numpy as np
 import pytest
+from interpret.glassbox import ExplainableBoostingClassifier as EBM
 from sklearn.base import is_classifier
 from sklearn.metrics import get_scorer
 
@@ -12,7 +13,7 @@ FAST = {"mlp": {"model__epochs": 2}, "tabnet": {"model__max_epochs": 2, "model__
         "xgboost": {"model__n_estimators": 20}}
 
 
-@pytest.mark.parametrize("cls", [XGB, TorchMLP, TabNetWrapper])
+@pytest.mark.parametrize("cls", [XGB, TorchMLP, TabNetWrapper, EBM])
 def test_wrapper_is_classifier(cls):
     # Fast guard, no fitting: with BaseEstimator before ClassifierMixin this is False
     # under sklearn >= 1.6 and every scorer call in CV fails.
