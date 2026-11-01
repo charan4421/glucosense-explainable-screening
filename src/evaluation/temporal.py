@@ -17,13 +17,36 @@ from src.preprocessing.pipeline import build_model_pipeline
 LAB_DERIVED = {"LBXGH", "LBXGLU", MAIN_LABEL, SENS_LABEL}
 
 
-def feature_columns(cfg: dict) -> list[str]:
-    """Feature list from the config; refuses lab-derived columns (label leakage)."""
-    feats = cfg["features"]["numeric"] + cfg["features"]["categorical"]
+def _check(feats: list[str]) -> list[str]:
     leaked = {f for f in feats if f in LAB_DERIVED or f.upper() in LAB_DERIVED}
     if leaked:
         raise ValueError(f"lab-derived columns in the feature list: {sorted(leaked)}")
+    gates = {f for f in feats if f.startswith("gate_")}
+    if gates:
+        raise ValueError(f"raw skip-pattern gate columns are not features: {sorted(gates)}")
     return feats
+
+
+def feature_columns(cfg: dict) -> list[str]:
+    """Set A feature list from cfg['features']; refuses lab-derived columns (label leakage)."""
+    return _check(cfg["features"]["numeric"] + cfg["features"]["categorical"])
+
+
+def feature_set(cfg: dict, name: str, base_for_d: str | None = None) -> tuple[list[str], list[str]]:
+    """(all features, categorical features) of a nested set, following `extends`.
+
+    Set D extends 'best_of_B_C', which must be resolved from results and passed as base_for_d."""
+    sets = cfg["feature_sets"]
+    spec = sets[name]
+    parent = spec.get("extends")
+    if parent == "best_of_B_C":
+        if base_for_d not in ("B", "C"):
+            raise ValueError("set D needs base_for_d = 'B' or 'C' (resolved from results)")
+        parent = base_for_d
+    feats, cat = feature_set(cfg, parent) if parent else ([], [])
+    feats = feats + [f for f in spec["numeric"] + spec["categorical"] if f not in feats]
+    cat = cat + [c for c in spec["categorical"] if c not in cat]
+    return _check(feats), cat
 
 
 def temporal_split(df: pd.DataFrame, test_cycle: str) -> tuple[pd.DataFrame, pd.DataFrame]:

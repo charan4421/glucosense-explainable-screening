@@ -3,13 +3,51 @@ seed: 42
 data:
   nhanes_cycles: ["2011-2012", "2013-2014", "2015-2016", "2017-2018"]
   raw_dir: data/raw
-  processed_path: data/processed/nhanes.parquet
+  processed_path: data/processed/nhanes.parquet          # v1 build (all cycles, old rules)
   temporal_test_cycle: "2017-2018"   # train on earlier cycles, test on this one
+  dev_cycles: ["2011-2012", "2013-2014", "2015-2016"]
+  dev_processed_path: data/processed/nhanes_dev.parquet  # v2 build: dev cycles only
 
-features:
+features:                             # set A (kept here for the v1 temporal run)
   numeric: [age, bmi, waist_cm, systolic_bp, diastolic_bp, height_cm]
   categorical: [sex, family_history_diabetes, smoker, race_eth]
   interactions: true                  # age*bmi, waist/height, bmi/age, etc.
+
+# Nested feature sets (docs/analysis_plan.md). Each set extends the previous one.
+feature_sets:
+  A:
+    numeric: [age, bmi, waist_cm, systolic_bp, diastolic_bp, height_cm]
+    categorical: [sex, family_history_diabetes, smoker, race_eth]
+  B:
+    extends: A
+    numeric: [pa_met_min_week, sedentary_min_day,                         # physical activity
+              sleep_hours, sleep_trouble_told,                             # sleep
+              cigs_per_day,                                                # smoking
+              drinks_per_week, binge_days_per_year,                        # alcohol
+              diet_self_rated, meals_out_week, fast_food_week, ready_meals_month,
+              frozen_meals_month, energy_kcal, fiber_g_per_1000kcal, sugar_pct_kcal,
+              satfat_pct_kcal, carb_pct_kcal,                              # diet quality
+              htn_told, htn_med_now,                                       # hypertension
+              gdm_history, baby_9lb,                                       # gestational diabetes
+              weight_change_1y_kg, weight_change_10y_kg, weight_change_10y_kg_na,
+              weight_gain_since_25_kg, weight_gain_since_25_kg_na, below_max_weight_kg,
+              tried_lose_weight]                                           # weight history
+    categorical: [smoking_status, drinking_status]
+  C:
+    extends: B
+    numeric: [education, income_poverty_ratio, food_insecurity_adult]
+    categorical: []
+  D:                                  # sensitivity only, never primary
+    extends: best_of_B_C              # resolved from results by the rule in the analysis plan
+    numeric: [insured, routine_care_place, healthcare_visits_bin, hospital_overnight]
+    categorical: []
+
+design:
+  main_models: [logreg, xgboost, ebm, mlp]     # strategy none
+  main_sets: [A, B, C]
+  set_a_only: [[xgboost, class_weight], [xgboost, smotenc], [mlp, class_weight],
+               [mlp, smotenc], [tabnet, none], [tabnet, smotenc]]
+  simplicity_order: [logreg, ebm, xgboost, mlp]   # simplest first, for the primary-model rule
 
 preprocessing:
   knn_neighbors: 5
@@ -20,8 +58,9 @@ imbalance:
 
 cv:
   outer_folds: 5
+  outer_repeats: 1
   inner_folds: 3
-  n_iter: 15
+  n_iter: 5                           # same tuning budget for every model
   scoring: average_precision          # PR-AUC
 
 models: [xgboost, mlp, tabnet]

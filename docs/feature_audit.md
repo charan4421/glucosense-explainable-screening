@@ -205,8 +205,8 @@ Missing % = no value in the cycles where the variable exists (structural skips i
 | ALQ | ALQ110 | Had at least 12 alcohol drinks/lifetime? | all 3 | 75.0 | 0.1 | Both males and females 18 YEARS - 150 YEARS | subset: asked if ALQ101 == 2 (answered 100% when true, 0% when false) |  |
 | ALQ | ALQ120Q | How often drink alcohol over past 12 mos | all 3 | 23.1 | 0.1 | Both males and females 18 YEARS - 150 YEARS | subset: asked if ALQ101 == 1 or ALQ110 == 1 (answered 100% when true, 0% when false) |  |
 | ALQ | ALQ120U | # days drink alcohol per wk, mo, yr | all 3 | 36.9 | 0.0 | Both males and females 18 YEARS - 150 YEARS | subset or non-response: 37% missing among eligible; gate not checked |  |
-| ALQ | ALQ130 | Avg # alcoholic drinks/day - past 12 mos | all 3 | 36.8 | 0.1 | Both males and females 18 YEARS - 150 YEARS | subset: asked if ALQ120Q > 0 and ALQ120Q < 777 (answered 82% when true, 0% when false) |  |
-| ALQ | ALQ141Q | # days have 4/5 drinks - past 12 mos | all 3 | 36.8 | 0.2 | Both males and females 18 YEARS - 150 YEARS | subset: asked if ALQ120Q > 0 and ALQ120Q < 777 (answered 82% when true, 0% when false) |  |
+| ALQ | ALQ130 | Avg # alcoholic drinks/day - past 12 mos | all 3 | 36.8 | 0.1 | Both males and females 18 YEARS - 150 YEARS | subset: asked if ALQ120Q > 0 and ALQ120Q < 777 (answered 100% when true, 0% when false) |  |
+| ALQ | ALQ141Q | # days have 4/5 drinks - past 12 mos | all 3 | 36.8 | 0.2 | Both males and females 18 YEARS - 150 YEARS | subset: asked if ALQ120Q > 0 and ALQ120Q < 777 (answered 100% when true, 0% when false) |  |
 | ALQ | ALQ141U | # days per week, month, year? | all 3 | 73.5 | 0.0 | Both males and females 18 YEARS - 150 YEARS | subset or non-response: 73% missing among eligible; gate not checked |  |
 | ALQ | ALQ151 | Ever have 4/5 or more drinks every day? | all 3 | 23.1 | 0.0 | Both males and females 18 YEARS - 150 YEARS | subset or non-response: 23% missing among eligible; gate not checked |  |
 

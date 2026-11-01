@@ -24,7 +24,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import requests  # noqa: E402
 
-from src.data.nhanes import XPT_MAGIC, label_frame  # noqa: E402
+from src.data.nhanes import XPT_MAGIC, fix_xpt_zero, label_frame  # noqa: E402
 
 RAW = Path("data/raw")
 DOCS = RAW / "docs"
@@ -210,18 +210,19 @@ def codebook(stem: str, letter: str) -> dict[str, dict]:
                           body, re.S)
         dk = [c.strip() for c, d in rows if d.strip().lower() in ("refused", "don't know")]
         out[var] = {"label": html.unescape(lab.group(1).strip()) if lab else "",
+                    "values": [(c.strip(), " ".join(html.unescape(d).split())) for c, d in rows],
                     "target": "; ".join(targets), "dk_codes": dk}
     return out
 
 
 def analysis_seqn(letter: str) -> pd.DataFrame:
     """SEQN + age/sex of the development analysis sample for one cycle (same rules as the label)."""
-    df = pd.read_sas(fetch("DEMO", letter), format="xport")[["SEQN", "RIAGENDR", "RIDAGEYR"]]
+    df = fix_xpt_zero(pd.read_sas(fetch("DEMO", letter), format="xport"))[["SEQN", "RIAGENDR", "RIDAGEYR"]]
     for stem, cols in [("DIQ", ["DIQ010", "DIQ050", "DIQ070"]), ("GHB", ["LBXGH"]),
                        ("GLU", ["LBXGLU", "WTSAF2YR"])]:
-        df = df.merge(pd.read_sas(fetch(stem, letter), format="xport")[["SEQN", *cols]],
+        df = df.merge(fix_xpt_zero(pd.read_sas(fetch(stem, letter), format="xport"))[["SEQN", *cols]],
                       on="SEQN", how="left")
-    return label_frame(df)[["SEQN", "RIAGENDR", "RIDAGEYR"]]
+    return label_frame(df, exclude_pregnant=False)[["SEQN", "RIAGENDR", "RIDAGEYR"]]
 
 
 def _codes(dk: list[str]) -> list[float]:
@@ -246,7 +247,7 @@ def audit() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
             p = fetch(stem, L)
             if p is None:
                 continue
-            d = pd.read_sas(p, format="xport")
+            d = fix_xpt_zero(pd.read_sas(p, format="xport"))
             keep = [v for _, s, v, _ in SPEC if s == stem and v in d] + \
                    [v for v in GATE_VARS if v in d and v not in base]
             keep = list(dict.fromkeys(keep))
@@ -301,15 +302,15 @@ def audit() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     for cycle, L in ALL.items():
         p = fetch("GHB", L)
         cb = codebook("GHB", L).get("LBXGH", {})
-        d = pd.read_sas(fetch("DEMO", L), format="xport")[["SEQN", "RIDAGEYR", "WTMEC2YR"]]
-        diq = pd.read_sas(fetch("DIQ", L), format="xport")
+        d = fix_xpt_zero(pd.read_sas(fetch("DEMO", L), format="xport"))[["SEQN", "RIDAGEYR", "WTMEC2YR"]]
+        diq = fix_xpt_zero(pd.read_sas(fetch("DIQ", L), format="xport"))
         pills = "DID070" if "DID070" in diq else "DIQ070"   # pills: DID070 in 2005-2008
         diq = diq.rename(columns={"DID070": "DIQ070"})
         d = d.merge(diq[["SEQN", "DIQ010", "DIQ050", "DIQ070"]], on="SEQN", how="left")
-        d = d.merge(pd.read_sas(p, format="xport")[["SEQN", "LBXGH"]], on="SEQN", how="left")
-        d = d.merge(pd.read_sas(fetch("GLU", L), format="xport")[["SEQN", "LBXGLU", "WTSAF2YR"]],
+        d = d.merge(fix_xpt_zero(pd.read_sas(p, format="xport"))[["SEQN", "LBXGH"]], on="SEQN", how="left")
+        d = d.merge(fix_xpt_zero(pd.read_sas(fetch("GLU", L), format="xport"))[["SEQN", "LBXGLU", "WTSAF2YR"]],
                     on="SEQN", how="left")
-        s = label_frame(d)
+        s = label_frame(d, exclude_pregnant=False)
         w = s.WTMEC2YR
         hba.append({"cycle": cycle, "file": f"GHB_{L}", "variable": "LBXGH",
                     "label": cb.get("label", ""), "target": cb.get("target", ""),
