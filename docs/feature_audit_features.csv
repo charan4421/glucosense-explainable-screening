@@ -1,0 +1,147 @@
+group,file,variable,meaning,cycles,missing_pct,refused_dk_pct,target,universe,flag
+physical activity,PAQ,PAQ605,Vigorous work activity,all 3,0.0,0.0,Both males and females 12 YEARS - 150 YEARS,everyone in target,
+physical activity,PAQ,PAQ610,Number of days vigorous work,all 3,80.7,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ605 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAD615,Minutes vigorous-intensity work,all 3,80.8,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ605 == 1 (answered 99% when true, 0% when false)",
+physical activity,PAQ,PAQ620,Moderate work activity,all 3,0.0,0.0,Both males and females 12 YEARS - 150 YEARS,everyone in target,
+physical activity,PAQ,PAQ625,Number of days moderate work,all 3,64.7,0.1,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ620 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAD630,Minutes moderate-intensity work,all 3,64.9,0.1,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ620 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAQ635,Walk or bicycle,all 3,0.0,0.0,Both males and females 12 YEARS - 150 YEARS,everyone in target,
+physical activity,PAQ,PAQ640,Number of days walk or bicycle,all 3,72.9,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ635 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAD645,Minutes walk/bicycle for transportation,all 3,73.0,0.1,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ635 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAQ650,Vigorous recreational activities,all 3,0.0,0.0,Both males and females 12 YEARS - 150 YEARS,everyone in target,
+physical activity,PAQ,PAQ655,Days vigorous recreational activities,all 3,74.7,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ650 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAD660,Minutes vigorous recreational activities,all 3,74.7,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ650 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAQ665,Moderate recreational activities,all 3,0.0,0.0,Both males and females 12 YEARS - 150 YEARS,everyone in target,
+physical activity,PAQ,PAQ670,Days moderate recreational activities,all 3,57.3,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ665 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAD675,Minutes moderate recreational activities,all 3,57.4,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if PAQ665 == 1 (answered 100% when true, 0% when false)",
+physical activity,PAQ,PAD680,Minutes sedentary activity,all 3,0.1,0.5,Both males and females 12 YEARS - 150 YEARS,everyone in target,
+physical activity,PAQ,PAQ710,Hours watch TV or videos past 30 days,all 3,0.0,0.1,Both males and females 2 YEARS - 150 YEARS,everyone in target,
+physical activity,PAQ,PAQ715,Hours use computer past 30 days,all 3,0.0,0.0,Both males and females 2 YEARS - 150 YEARS,everyone in target,
+sleep,SLQ,SLD010H,How much sleep do you get (hours)?,"11-12, 13-14",0.1,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+sleep,SLQ,SLD012,Sleep hours,15-16,0.5,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+sleep,SLQ,SLQ030,How often do you snore?,15-16,0.0,7.3,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+sleep,SLQ,SLQ040,How often do you snort or stop breathing,15-16,0.0,5.8,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+sleep,SLQ,SLQ050,Ever told doctor had trouble sleeping?,all 3,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+sleep,SLQ,SLQ060,Ever told by doctor have sleep disorder?,"11-12, 13-14",0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+sleep,SLQ,SLQ120,How often feel overly sleepy during day?,15-16,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+smoking,SMQ,SMQ020,Smoked at least 100 cigarettes in life,all 3,0.0,0.1,Both males and females 18 YEARS - 150 YEARS,everyone in target,
+smoking,SMQ,SMQ040,Do you now smoke cigarettes?,all 3,58.2,0.0,Both males and females 18 YEARS - 150 YEARS,"subset: asked if SMQ020 == 1 (answered 100% when true, 0% when false)",
+smoking,SMQ,SMD030,Age started smoking cigarettes regularly,all 3,58.2,0.2,Both males and females 18 YEARS - 150 YEARS,"subset: asked if SMQ020 == 1 (answered 100% when true, 0% when false)",
+smoking,SMQ,SMD641,# days smoked cigs during past 30 days,all 3,79.6,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if SMQ040 in [1, 2] (answered 100% when true, 0% when false)",
+smoking,SMQ,SMD650,Avg # cigarettes/day during past 30 days,all 3,79.8,0.0,Both males and females 12 YEARS - 150 YEARS,"subset: asked if SMQ040 in [1, 2] (answered 99% when true, 0% when false)",
+smoking,SMQ,SMQ050Q,How long since quit smoking cigarettes,all 3,78.6,0.1,Both males and females 18 YEARS - 150 YEARS,"subset: asked if SMQ040 == 3 (answered 100% when true, 0% when false)",
+smoking,SMQ,SMQ050U,Unit of measure (day/week/month/year),all 3,79.3,0.0,Both males and females 18 YEARS - 150 YEARS,"subset: asked if SMQ040 == 3 (answered 97% when true, 0% when false)",
+alcohol,ALQ,ALQ101,Had at least 12 alcohol drinks/1 yr?,all 3,9.5,0.1,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 9% missing among eligible; gate not checked,
+alcohol,ALQ,ALQ110,Had at least 12 alcohol drinks/lifetime?,all 3,75.0,0.1,Both males and females 18 YEARS - 150 YEARS,"subset: asked if ALQ101 == 2 (answered 100% when true, 0% when false)",
+alcohol,ALQ,ALQ120Q,How often drink alcohol over past 12 mos,all 3,23.1,0.1,Both males and females 18 YEARS - 150 YEARS,"subset: asked if ALQ101 == 1 or ALQ110 == 1 (answered 100% when true, 0% when false)",
+alcohol,ALQ,ALQ120U,"# days drink alcohol per wk, mo, yr",all 3,36.9,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 37% missing among eligible; gate not checked,
+alcohol,ALQ,ALQ130,Avg # alcoholic drinks/day - past 12 mos,all 3,36.8,0.1,Both males and females 18 YEARS - 150 YEARS,"subset: asked if ALQ120Q > 0 and ALQ120Q < 777 (answered 82% when true, 0% when false)",
+alcohol,ALQ,ALQ141Q,# days have 4/5 drinks - past 12 mos,all 3,36.8,0.2,Both males and females 18 YEARS - 150 YEARS,"subset: asked if ALQ120Q > 0 and ALQ120Q < 777 (answered 82% when true, 0% when false)",
+alcohol,ALQ,ALQ141U,"# days per week, month, year?",all 3,73.5,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 73% missing among eligible; gate not checked,
+alcohol,ALQ,ALQ151,Ever have 4/5 or more drinks every day?,all 3,23.1,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 23% missing among eligible; gate not checked,
+diet quality,DBQ,DBQ700,How healthy is the diet,all 3,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+diet quality,DBQ,DBD895,# of meals not home prepared,all 3,0.0,0.0,Both males and females 1 YEARS - 150 YEARS,everyone in target,
+diet quality,DBQ,DBD900,# of meals from fast food or pizza place,all 3,22.5,0.0,Both males and females 1 YEARS - 150 YEARS,subset or non-response: 22% missing among eligible; gate not checked,
+diet quality,DBQ,DBD905,# of ready-to-eat foods in past 30 days,all 3,0.2,0.1,Both males and females 1 YEARS - 150 YEARS,everyone in target,
+diet quality,DBQ,DBD910,# of frozen meals/pizza in past 30 days,all 3,0.2,0.0,Both males and females 1 YEARS - 150 YEARS,everyone in target,
+diet quality,DBQ,DBQ197,Past 30 day milk product consumption,all 3,0.0,0.0,Both males and females 1 YEARS - 150 YEARS,everyone in target,
+diet quality,DR1TOT,DR1TKCAL,Energy (kcal),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1TCARB,Carbohydrate (gm),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1TSUGR,Total sugars (gm),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1TFIBE,Dietary fiber (gm),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1TTFAT,Total fat (gm),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1TSFAT,Total saturated fatty acids (gm),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1TSODI,Sodium (mg),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1TALCO,Alcohol (gm),all 3,8.2,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+diet quality,DR1TOT,DR1DRSTZ,Dietary recall status,all 3,0.0,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,single 24-h recall (day 1): noisy for one person; has its own dietary weight WTDRD1
+"education, income, food security",DEMO,DMDEDUC2,Education level - Adults 20+,all 3,0.0,0.0,Both males and females 20 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",DEMO,INDFMPIR,Ratio of family income to poverty,all 3,8.5,0.0,Both males and females 0 YEARS - 150 YEARS,subset or non-response: 8% missing among eligible; gate not checked,
+"education, income, food security",DEMO,INDHHIN2,Annual household income,all 3,1.6,3.5,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",DEMO,DMDMARTL,Marital status,all 3,0.0,0.0,Both males and females 20 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",DEMO,DMDHHSIZ,Total number of people in the Household,all 3,0.0,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",DEMO,DMDBORN4,Country of birth,all 3,0.0,0.1,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",DEMO,DMDCITZN,Citizenship status,all 3,0.1,0.2,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",DEMO,DMDYRSUS,Length of time in US,all 3,68.9,1.2,Both males and females 0 YEARS - 150 YEARS,"subset: asked if DMDBORN4 == 2 (answered 100% when true, 0% when false)",
+"education, income, food security",DEMO,SIALANG,Language of SP Interview,all 3,0.0,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",FSQ,FSDHH,Household food security category,all 3,1.4,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",FSQ,FSDAD,Adult food security category,all 3,1.4,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",FSQ,FSQ165,HH FS benefit: ever received,all 3,1.3,0.3,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",HIQ,HIQ011,Covered by health insurance,all 3,0.0,0.1,Both males and females 0 YEARS - 150 YEARS,everyone in target,healthcare access: drives being diagnosed vs undiagnosed (selection into the label)
+"education, income, food security",OCQ,OCD150,Type of work done last week,all 3,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+"education, income, food security",OCQ,OCQ180,Hours worked last week at all jobs,all 3,42.4,0.1,Both males and females 16 YEARS - 150 YEARS,"subset: asked if OCD150 in [1, 2] (answered 97% when true, 0% when false)",
+weight history,WHQ,WHD010,Current self-reported height (inches),all 3,0.3,1.6,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+weight history,WHQ,WHD020,Current self-reported weight (pounds),all 3,0.3,1.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+weight history,WHQ,WHQ030,How do you consider your weight,all 3,0.0,0.3,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+weight history,WHQ,WHQ040,"Like to weigh more, less or same",all 3,0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+weight history,WHQ,WHD050,Self-reported weight - 1 yr ago (pounds),all 3,0.2,1.5,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+weight history,WHQ,WHD110,Self-reported weight-10 yrs ago (pounds),all 3,31.6,1.9,Both males and females 36 YEARS - 150 YEARS,subset or non-response: 32% missing among eligible; gate not checked,
+weight history,WHQ,WHD120,Self-reported weight-age 25 (pounds),all 3,14.3,3.5,Both males and females 27 YEARS - 150 YEARS,subset or non-response: 14% missing among eligible; gate not checked,
+weight history,WHQ,WHD130,Self-reported height - age 25 (inches),all 3,56.9,1.6,Both males and females 50 YEARS - 150 YEARS,subset or non-response: 57% missing among eligible; gate not checked,
+weight history,WHQ,WHD140,Self-reported greatest weight (pounds),all 3,0.1,1.3,Both males and females 18 YEARS - 150 YEARS,everyone in target,
+weight history,WHQ,WHQ150,Age when heaviest weight,all 3,1.6,0.6,Both males and females 18 YEARS - 150 YEARS,"subset: asked if WHD140 > 0 and WHD140 < 7777 (answered 100% when true, 0% when false)",
+weight history,WHQ,WHQ070,Tried to lose weight in past year,all 3,11.4,0.1,Both males and females 16 YEARS - 150 YEARS,subset or non-response: 11% missing among eligible; gate not checked,
+weight history,WHQ,WHQ060,Weight change intentional,all 3,82.2,0.0,Both males and females 16 YEARS - 150 YEARS,subset or non-response: 82% missing among eligible; gate not checked,unintentional weight loss is a symptom of hyperglycaemia (reverse causation)
+"blood pressure, hypertension",BPQ,BPQ020,Ever told you had high blood pressure,all 3,0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,
+"blood pressure, hypertension",BPQ,BPQ030,Told had high blood pressure - 2+ times,all 3,68.9,0.1,Both males and females 16 YEARS - 150 YEARS,"subset: asked if BPQ020 == 1 (answered 100% when true, 0% when false)",
+"blood pressure, hypertension",BPQ,BPD035,Age told had hypertension,all 3,69.0,0.4,Both males and females 16 YEARS - 150 YEARS,"subset: asked if BPQ020 == 1 (answered 100% when true, 0% when false)",
+"blood pressure, hypertension",BPQ,BPQ040A,Taking prescription for hypertension,all 3,68.9,0.0,Both males and females 16 YEARS - 150 YEARS,"subset: asked if BPQ020 == 1 (answered 100% when true, 0% when false)",antihypertensive (not diabetes) medication; some (ACE inhibitors/ARBs) are also given for diabetic kidney protection
+"blood pressure, hypertension",BPQ,BPQ050A,Now taking prescribed medicine for HBP,all 3,74.2,0.0,Both males and females 16 YEARS - 150 YEARS,"subset: asked if BPQ040A == 1 (answered 100% when true, 0% when false)",as BPQ040A
+"blood pressure, hypertension",BPX,BPXPLS,60 sec. pulse (30 sec. pulse * 2),all 3,3.2,0.0,Both males and females 8 YEARS - 150 YEARS,everyone in target,
+"blood pressure, hypertension",BPQ,BPQ060,Ever had blood cholesterol checked,all 3,29.8,2.4,Both males and females 16 YEARS - 150 YEARS,subset or non-response: 30% missing among eligible; gate not checked,healthcare contact (cholesterol test)
+"blood pressure, hypertension",BPQ,BPQ080,Doctor told you - high cholesterol level,all 3,0.0,0.5,Both males and females 16 YEARS - 150 YEARS,everyone in target,"diagnosis that rests on a lab test (cholesterol); not glucose, but lab-derived"
+"blood pressure, hypertension",BPQ,BPQ090D,Told to take prescriptn for cholesterol,all 3,26.8,0.1,Both males and females 16 YEARS - 150 YEARS,subset or non-response: 27% missing among eligible; gate not checked,lipid medication: lab-derived diagnosis
+reproductive history,RHQ,RHQ010,Age when first menstrual period occurred,all 3,53.8,0.4,Females only 12 YEARS - 150 YEARS,"subset: asked if RIAGENDR == 2 (answered 89% when true, 0% when false)",
+reproductive history,RHQ,RHQ031,Had regular periods in past 12 months,all 3,53.8,0.0,Females only 12 YEARS - 150 YEARS,"subset: asked if RIAGENDR == 2 (answered 89% when true, 0% when false)",
+reproductive history,RHQ,RHQ060,Age at last menstrual period,all 3,77.3,0.8,Females only 12 YEARS - 150 YEARS,"subset: asked if RHQ031 == 2 (answered 99% when true, 0% when false)",
+reproductive history,RHQ,RHQ131,Ever been pregnant?,all 3,53.9,0.0,Females only 20 YEARS - 150 YEARS,"subset: asked if RIAGENDR == 2 (answered 89% when true, 0% when false)",
+reproductive history,RHQ,RHQ160,How many times have been pregnant?,all 3,62.0,0.0,Females only 20 YEARS - 150 YEARS,"subset: asked if RHQ131 == 1 (answered 100% when true, 0% when false)",
+reproductive history,RHQ,RHQ171,How many deliveries live birth result?,all 3,64.1,0.0,Females only 20 YEARS - 150 YEARS,"subset: asked if RHQ131 == 1 (answered 94% when true, 0% when false)",
+reproductive history,RHQ,RHD180,Age at first live birth,all 3,69.7,0.1,Females only 20 YEARS - 150 YEARS,"subset: asked if RHQ131 == 1 (answered 80% when true, 0% when false)",
+reproductive history,RHQ,RHQ172,Any babies weigh 9 lbs or more?,all 3,64.1,0.2,Females only 20 YEARS - 150 YEARS,"subset: asked if RHQ131 == 1 (answered 94% when true, 0% when false)",
+reproductive history,RHQ,RHD280,Had a hysterectomy?,all 3,53.9,0.0,Females only 20 YEARS - 150 YEARS,"subset: asked if RIAGENDR == 2 (answered 89% when true, 0% when false)",
+reproductive history,RHQ,RHQ540,Ever use female hormones?,all 3,53.8,0.1,Females only 20 YEARS - 150 YEARS,"subset: asked if RIAGENDR == 2 (answered 89% when true, 0% when false)",
+reproductive history,RHQ,RHQ162,"During pregnancy, told you have diabetes",all 3,62.0,0.1,Females only 20 YEARS - 150 YEARS,"subset: asked if RHQ131 == 1 (answered 100% when true, 0% when false)","gestational diabetes is an ADA risk item, but it is a past glucose-based diabetes diagnosis; women who later developed diabetes may recall it more (borderline)"
+reproductive history,DEMO,RIDEXPRG,Pregnancy status at exam,all 3,75.2,0.0,Females only 20 YEARS - 44 YEARS,subset or non-response: 52% missing among eligible; gate not checked,"pregnancy at exam: HbA1c is lower in pregnancy; candidate EXCLUSION, not a feature"
+other: body measures and fitness,BMX,BMXWT,Weight (kg),all 3,0.9,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+other: body measures and fitness,BMX,BMXARMC,Arm Circumference (cm),all 3,3.9,0.0,Both males and females 2 MONTHS - 150 YEARS,everyone in target,
+other: body measures and fitness,BMX,BMXARML,Upper Arm Length (cm),all 3,3.9,0.0,Both males and females 2 MONTHS - 150 YEARS,everyone in target,
+other: body measures and fitness,BMX,BMXLEG,Upper Leg Length (cm),all 3,4.9,0.0,Both males and females 8 YEARS - 150 YEARS,everyone in target,
+other: body measures and fitness,BMX,BMDAVSAD,Average Sagittal Abdominal Diameter (cm),all 3,7.5,0.0,Both males and females 8 YEARS - 150 YEARS,subset or non-response: 7% missing among eligible; gate not checked,
+other: body measures and fitness,MGX,MGDCGSZ,Combined grip strength (kg),"11-12, 13-14",9.2,0.0,Both males and females 6 YEARS - 150 YEARS,subset or non-response: 9% missing among eligible; gate not checked,
+other: general and mental health,HUQ,HUQ010,General health condition,all 3,0.0,0.1,Both males and females 0 YEARS - 150 YEARS,everyone in target,
+other: general and mental health,DPQ,DPQ010,Have little interest in doing things,all 3,9.9,0.1,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ020,"Feeling down, depressed, or hopeless",all 3,9.9,0.1,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ030,Trouble sleeping or sleeping too much,all 3,9.9,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ040,Feeling tired or having little energy,all 3,10.0,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ050,Poor appetite or overeating,all 3,10.0,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ060,Feeling bad about yourself,all 3,10.0,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ070,Trouble concentrating on things,all 3,10.0,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ080,Moving or speaking slowly or too fast,all 3,10.0,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,DPQ,DPQ090,Thought you would be better off dead,all 3,10.0,0.0,Both males and females 18 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,
+other: general and mental health,CDQ,CDQ001,SP ever had pain or discomfort in chest,all 3,38.7,0.1,Both males and females 40 YEARS - 150 YEARS,subset or non-response: 39% missing among eligible; gate not checked,
+other: general and mental health,CDQ,CDQ010,Shortness of breath on stairs/inclines,all 3,38.7,0.1,Both males and females 40 YEARS - 150 YEARS,subset or non-response: 39% missing among eligible; gate not checked,
+other: healthcare access,HUQ,HUQ030,Routine place to go for healthcare,all 3,0.0,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,healthcare access: drives being diagnosed vs undiagnosed (selection into the label)
+other: healthcare access,HUQ,HUQ051,#times receive healthcare over past year,"13-14, 15-16",0.0,0.1,Both males and females 0 YEARS - 150 YEARS,everyone in target,as HUQ030
+other: healthcare access,HUQ,HUQ071,Overnight hospital patient in last year,all 3,0.0,0.0,Both males and females 0 YEARS - 150 YEARS,everyone in target,as HUQ030
+other: comorbidities and advice,MCQ,MCQ080,Doctor ever said you were overweight,all 3,0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,doctor told overweight: follows a healthcare visit; mostly restates BMI
+other: comorbidities and advice,MCQ,MCQ300A,Close relative had heart attack?,all 3,0.0,2.3,Both males and females 20 YEARS - 150 YEARS,everyone in target,
+other: comorbidities and advice,MCQ,MCQ160B,Ever told had congestive heart failure,all 3,0.0,0.1,Both males and females 20 YEARS - 150 YEARS,everyone in target,cardiovascular disease is a diabetes complication (reverse causation) and implies healthcare contact
+other: comorbidities and advice,MCQ,MCQ160C,Ever told you had coronary heart disease,all 3,0.0,0.2,Both males and females 20 YEARS - 150 YEARS,everyone in target,cardiovascular disease is a diabetes complication (reverse causation) and implies healthcare contact
+other: comorbidities and advice,MCQ,MCQ160E,Ever told you had heart attack,all 3,0.0,0.1,Both males and females 20 YEARS - 150 YEARS,everyone in target,cardiovascular disease is a diabetes complication (reverse causation) and implies healthcare contact
+other: comorbidities and advice,MCQ,MCQ160F,Ever told you had a stroke,all 3,0.0,0.1,Both males and females 20 YEARS - 150 YEARS,everyone in target,cardiovascular disease is a diabetes complication (reverse causation) and implies healthcare contact
+other: comorbidities and advice,MCQ,MCQ160L,Ever told you had any liver condition,all 3,0.0,0.1,Both males and females 20 YEARS - 150 YEARS,everyone in target,liver disease (NAFLD link); diagnosis
+other: comorbidities and advice,MCQ,MCQ220,Ever told you had cancer or malignancy,all 3,0.0,0.0,Both males and females 20 YEARS - 150 YEARS,everyone in target,
+other: comorbidities and advice,MCQ,MCQ365A,Doctor told you to lose weight,all 3,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,doctor advice (lose weight / exercise / salt / fat) can follow abnormal glucose or HbA1c results: possible label leakage
+other: comorbidities and advice,MCQ,MCQ365B,Doctor told you to exercise,all 3,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,doctor advice (lose weight / exercise / salt / fat) can follow abnormal glucose or HbA1c results: possible label leakage
+other: comorbidities and advice,MCQ,MCQ365C,Doctor told you to reduce salt in diet,all 3,0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,doctor advice (lose weight / exercise / salt / fat) can follow abnormal glucose or HbA1c results: possible label leakage
+other: comorbidities and advice,MCQ,MCQ365D,Doctor told you to reduce fat/calories,all 3,0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,doctor advice (lose weight / exercise / salt / fat) can follow abnormal glucose or HbA1c results: possible label leakage
+other: comorbidities and advice,MCQ,MCQ370A,Are you now controlling or losing weight,all 3,0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,behaviour change after the advice above: same leakage risk
+other: comorbidities and advice,MCQ,MCQ370B,Are you now increasing exercise,all 3,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,behaviour change after the advice above: same leakage risk
+other: comorbidities and advice,MCQ,MCQ370C,Are you now reducing salt in diet,all 3,0.0,0.0,Both males and females 16 YEARS - 150 YEARS,everyone in target,behaviour change after the advice above: same leakage risk
+other: comorbidities and advice,MCQ,MCQ370D,Are you now reducing fat in diet,all 3,0.0,0.1,Both males and females 16 YEARS - 150 YEARS,everyone in target,behaviour change after the advice above: same leakage risk
+other: comorbidities and advice,KIQ_U,KIQ022,Ever told you had weak/failing kidneys,all 3,0.0,0.1,Both males and females 20 YEARS - 150 YEARS,everyone in target,kidney disease is a diabetes complication (reverse causation)
+other: comorbidities and advice,KIQ_U,KIQ480,How many times urinate in night?,all 3,9.6,0.0,Both males and females 20 YEARS - 150 YEARS,subset or non-response: 10% missing among eligible; gate not checked,"nocturia: a symptom of hyperglycaemia (legitimate screening symptom, but close to the outcome)"
+other: diabetes-adjacent questions,DIQ,DIQ160,Ever told you have prediabetes,all 3,2.4,0.1,Both males and females 12 YEARS - 150 YEARS,everyone in target,PREDIABETES DIAGNOSIS: based on a glucose/HbA1c test: near-direct proxy for the label
+other: diabetes-adjacent questions,DIQ,DIQ170,Ever told have health risk for diabetes,all 3,0.0,0.2,Both males and females 12 YEARS - 150 YEARS,everyone in target,told at risk for diabetes: follows testing or a clinical judgement: label-adjacent
+other: diabetes-adjacent questions,DIQ,DIQ172,Feel could be at risk for diabetes,all 3,0.0,1.3,Both males and females 12 YEARS - 150 YEARS,everyone in target,feels at risk: may reflect known test results: label-adjacent
+other: diabetes-adjacent questions,DIQ,DIQ180,Had blood tested past three years,all 3,0.0,2.8,Both males and females 12 YEARS - 150 YEARS,everyone in target,"had a blood test for diabetes in past 3 years: healthcare contact, and a negative test makes undiagnosed diabetes less likely"
