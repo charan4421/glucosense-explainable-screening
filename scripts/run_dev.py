@@ -5,6 +5,8 @@ Stages, run in this order (cheapest first, so a crash loses the least work):
   d       main models on set D = best of B/C (rule) + healthcare access; sensitivity only
   loco    leave-one-cycle-out, main models on the primary set (rule)
   extras  set A only: rebalancing variants and TabNet
+Then: summary (mean +/- SD), selection rules, and paired model/set differences on identical folds
+with Nadeau-Bengio corrected 95 % intervals (results/dev_cv_v2_paired.csv).
 
 Every combination is checkpointed to results/dev_cv_v2/ (LOCO: results/dev_cv_v2/loco/) with a
 hash of its data, settings and features, and skipped on restart when the hash matches.
@@ -35,6 +37,7 @@ from src.evaluation.checkpoint import (  # noqa: E402
     save_combo,
     save_oof,
 )
+from src.evaluation.compare import comparison_table  # noqa: E402
 from src.evaluation.loco import loco  # noqa: E402
 from src.evaluation.nested_cv import nested_cv  # noqa: E402
 from src.evaluation.selection import base_for_d, primary_model, primary_set  # noqa: E402
@@ -132,6 +135,10 @@ def main(cfg_path: str, stages: list[str], dry: bool) -> None:
     Path("results/dev_cv_v2_selection.json").write_text(
         json.dumps({k: (float(v) if hasattr(v, "item") else v) for k, v in selection.items()},
                    indent=2))
+    folds = pd.concat([pd.read_csv(f) for f in sorted(OUT.glob("*__*.csv"))], ignore_index=True)
+    sets = [s for s in ["A", "B", "C", "D"] if s in set(folds.feature_set)]
+    comparison_table(folds, des["main_models"], sets, cfg["cv"]["outer_folds"]).to_csv(
+        "results/dev_cv_v2_paired.csv", index=False, float_format="%.5f")
     if LOCO_DIR.exists() and any(LOCO_DIR.glob("*.csv")):
         pd.concat([pd.read_csv(f) for f in sorted(LOCO_DIR.glob("*.csv"))]).to_csv(
             "results/dev_cv_v2_loco.csv", index=False, float_format="%.4f")

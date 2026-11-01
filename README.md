@@ -23,8 +23,11 @@ Calibrated, explainable screening for **undiagnosed diabetes** from non-laborato
 ```bash
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m src.data.nhanes --download                 # downloads XPT files from CDC
-# nested CV on 2011-2016 only; each model/strategy is checkpointed to results/dev_cv/ and
+python -m src.data.nhanes --download                 # builds 2011-2016 only (dev data v2)
+# development analysis v2 (docs/analysis_plan.md): models x feature sets A-D, 5-fold x 3
+# repeats nested CV, leave-one-cycle-out; checkpointed to results/dev_cv_v2/
+python scripts/run_dev.py
+# v1 (earlier, set A only): nested CV on 2011-2016 only; each model/strategy is checkpointed to results/dev_cv/ and
 # skipped on restart if config + seed + n_iter are unchanged
 python scripts/run_experiment.py --config configs/config.yaml --n-iter 5
 python scripts/run_experiment.py --models logreg,ada_style --strategies none --n-iter 5   # baselines
@@ -53,3 +56,6 @@ tests/        synthetic-data tests (no downloads needed)
 - Counterfactuals are model explanations, not causal advice.
 - SMOTE-NC distorts probabilities; the calibration cost is reported, not hidden.
 - Nested CV reduces optimistic bias; it does not remove it.
+- SDs across repeated CV folds are not independent: training sets overlap, so they understate
+  the uncertainty. Reported SDs describe spread, not standard errors. Model and set differences
+  are compared on identical folds with the Nadeau-Bengio corrected 95 % interval instead.

@@ -58,7 +58,7 @@ imbalance:
 
 cv:
   outer_folds: 5
-  outer_repeats: 1
+  outer_repeats: 3                    # 5-fold outer CV repeated 3 times (15 folds)
   inner_folds: 3
   n_iter: 5                           # same tuning budget for every model
   scoring: average_precision          # PR-AUC
