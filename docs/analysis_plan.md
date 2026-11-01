@@ -117,7 +117,7 @@ Sets are nested (A ⊂ B ⊂ C) and defined in `configs/config.yaml`. They are d
 - **Main models:**
   - L2 logistic regression (C tuned)
   - XGBoost with no rebalancing
-  - Explainable Boosting Machine (interpret-core; 8 outer bags, 4 jobs; interactions,
+  - Explainable Boosting Machine (interpret-core; 8 outer bags, 2 jobs (see Deviations); interactions,
     learning rate, leaves and minimum leaf size tuned)
   - MLP
 
@@ -237,4 +237,15 @@ n_iter. A restart skips a combination only if the hash matches.
 
 ## Deviations
 
-None yet.
+- **2026-11-01: EBM parallel jobs reduced from 4 to 2 (`n_jobs`), because of memory.**
+  - **Why:** the first run (started 22:24) was stopped by the system at 23:05 for low memory,
+    during XGBoost on set B.
+  - **Effect on results:** none expected. `n_jobs` only sets how many outer bags are fitted in
+    parallel, each bag is seeded from `random_state`, and nothing else changes. EBM had not
+    started when the change was made.
+  - **Kept:** the four combinations finished before the stop, saved with their hashes. The
+    hashes cover data, CV, preprocessing and features, not EBM's `n_jobs`, so these
+    combinations remain valid:
+    - logistic regression / A, B, C
+    - XGBoost / A
+  - **Restart:** after a reboot, and only once at least 3 GB of memory is free.
