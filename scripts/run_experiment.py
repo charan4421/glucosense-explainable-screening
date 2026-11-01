@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))   # repo root, so `src` imports work
@@ -20,6 +21,15 @@ import pandas as pd  # noqa: E402
 import yaml  # noqa: E402
 
 from src.data.nhanes import MAIN_LABEL  # noqa: E402
+from src.evaluation.checkpoint import (  # noqa: E402
+    build_summary,
+    combo_path,
+    is_done,
+    load_oof,
+    run_hash,
+    save_combo,
+    save_oof,
+)
 from src.evaluation.metrics import (  # noqa: E402
     bootstrap_ci,
     calibration_stats,
@@ -78,17 +88,19 @@ def run_temporal(cfg: dict, models: list[str], strategies: list[str],
     return res
 
 
-SUMMARY_METRICS = ["pr_auc", "roc_auc", "brier", "citl_difference", "citl_ratio_observed_expected",
-                   "calibration_slope", "prevalence", "fit_seconds"]
+DEV_CV_DIR = Path("results/dev_cv")
+OOF_DIR = Path("reports/dev_cv_oof")
 
 
 def main(cfg_path: str, models: list[str] | None = None, strategies: list[str] | None = None,
          n_iter: int | None = None) -> None:
-    """Nested CV on the development cycles only: the temporal test cycle is removed first."""
+    """Nested CV on the development cycles only: the temporal test cycle is removed first.
+
+    Each combination is checkpointed to results/dev_cv/ when it finishes; a restart skips
+    combinations whose file carries the current config/seed/n_iter hash."""
     cfg = yaml.safe_load(open(cfg_path))
-    out, res_dir = Path("reports"), Path("results")
+    out = Path("reports")
     out.mkdir(exist_ok=True)
-    res_dir.mkdir(exist_ok=True)
 
     test_cycle = cfg["data"]["temporal_test_cycle"]
     dev, _ = temporal_split(pd.read_parquet(cfg["data"]["processed_path"]), test_cycle)
@@ -99,32 +111,42 @@ def main(cfg_path: str, models: list[str] | None = None, strategies: list[str] |
     cat = cfg["features"]["categorical"]
     cv = cfg["cv"]
     n_iter = n_iter or cv["n_iter"]
+    h = run_hash(cfg, cfg["seed"], n_iter)
+    print(f"run hash {h} (config + seed {cfg['seed']} + n_iter {n_iter})", flush=True)
 
-    all_rows, oof_store = [], {}
-    for model in models or cfg["models"]:
-        for strategy in strategies or cfg["imbalance"]["strategies"]:
-            if model == "tabnet" and strategy == "class_weight":
-                continue
-            print(f"== {model} / {strategy}  (outer {cv['outer_folds']}, inner {cv['inner_folds']}, "
-                  f"n_iter {n_iter})", flush=True)
-            res, oof = nested_cv(
-                X, y, model, strategy, cat, cv["outer_folds"], cv["inner_folds"], n_iter,
-                cv["scoring"], cfg["preprocessing"]["knn_neighbors"],
-                cfg["features"]["interactions"], cfg["seed"])
-            print(f"   {res.fit_seconds.sum():.0f}s  PR-AUC {res.pr_auc.mean():.4f}", flush=True)
-            all_rows.append(res)
-            oof_store[(model, strategy)] = oof
+    combos = [(m, s) for m in models or cfg["models"]
+              for s in strategies or cfg["imbalance"]["strategies"]
+              if not (m == "tabnet" and s == "class_weight")]
+    oof_store, t_start = {}, time.perf_counter()
+    for i, (model, strategy) in enumerate(combos, 1):
+        path = combo_path(DEV_CV_DIR, model, strategy)
+        oof_path = OOF_DIR / f"{model}__{strategy}.csv"
+        tag = f"[{i}/{len(combos)}] {model} / {strategy}"
+        if is_done(path, h):
+            print(f"{tag}: checkpoint matches, skipped", flush=True)
+            oof = load_oof(oof_path, h)
+            if oof is not None:
+                oof_store[(model, strategy)] = oof
+            continue
+        print(f"{tag}: running (outer {cv['outer_folds']}, inner {cv['inner_folds']}, "
+              f"n_iter {n_iter})", flush=True)
+        t0 = time.perf_counter()
+        res, oof = nested_cv(
+            X, y, model, strategy, cat, cv["outer_folds"], cv["inner_folds"], n_iter,
+            cv["scoring"], cfg["preprocessing"]["knn_neighbors"],
+            cfg["features"]["interactions"], cfg["seed"])
+        save_combo(res, path, h)
+        save_oof(oof, oof_path, h)
+        oof_store[(model, strategy)] = oof
+        print(f"{tag}: done in {time.perf_counter() - t0:.0f}s (total elapsed "
+              f"{time.perf_counter() - t_start:.0f}s)  PR-AUC {res.pr_auc.mean():.4f}  -> {path}",
+              flush=True)
 
-    results = pd.concat(all_rows, ignore_index=True)
-    results.to_csv(out / "nested_cv_folds.csv", index=False)
-    summary = results.groupby(["model", "strategy"])[SUMMARY_METRICS].agg(["mean", "std"])
-    summary[("fit_seconds", "total")] = results.groupby(["model", "strategy"]).fit_seconds.sum()
-    summary.to_csv(out / "nested_cv_summary.csv")
-    tag = f"niter{n_iter}"
-    results.to_csv(res_dir / f"nested_cv_folds_{tag}.csv", index=False)
-    summary.round(4).to_csv(res_dir / f"nested_cv_summary_{tag}.csv")
-    with pd.option_context("display.width", 200, "display.max_columns", 30):
+    summary = build_summary(DEV_CV_DIR, Path("results/dev_cv_summary.csv"))
+    with pd.option_context("display.width", 220, "display.max_columns", 40):
         print(summary.round(4))
+    if not oof_store:
+        return
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.5))
     for (model, strategy), oof in oof_store.items():

@@ -48,5 +48,8 @@ def nested_cv(X: pd.DataFrame, y, model_name: str, strategy: str, categorical: l
                      "citl_difference": cal["citl_difference"],
                      "citl_ratio_observed_expected": cal["citl_ratio_observed_expected"],
                      "calibration_slope": cal["slope"],
+                     "calibration_intercept": cal["intercept"],
+                     "calibration_intercept_offset": cal["intercept_offset"],
+                     "n_pos": int(y[te].sum()), "n": len(te),
                      "fit_seconds": time.perf_counter() - t0})
     return pd.DataFrame(rows), oof

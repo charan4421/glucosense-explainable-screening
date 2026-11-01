@@ -20,7 +20,10 @@ Calibrated, explainable screening for **undiagnosed diabetes** from non-laborato
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python -m src.data.nhanes --download                 # downloads XPT files from CDC
-python scripts/run_experiment.py --config configs/config.yaml
+# nested CV on 2011-2016 only; each model/strategy is checkpointed to results/dev_cv/ and
+# skipped on restart if config + seed + n_iter are unchanged
+python scripts/run_experiment.py --config configs/config.yaml --n-iter 5
+python scripts/summarize_dev_cv.py                   # rebuild results/dev_cv_summary.csv any time
 # temporal test: tune on 2011-2016, score once on 2017-2018 (reports/temporal_test.csv)
 python scripts/run_experiment.py --mode temporal --models xgboost --strategies none
 ```
