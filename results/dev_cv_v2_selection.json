@@ -1,0 +1,10 @@
+{
+  "d_base": "C",
+  "primary_set": "A",
+  "best_set": "C",
+  "best_model": "ebm",
+  "best_pr_auc": 0.09638014999820206,
+  "best_pr_auc_sd": 0.011622213025412218,
+  "threshold": 0.08475793697278984,
+  "primary_model": "logreg"
+}

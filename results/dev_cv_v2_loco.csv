@@ -1,0 +1,13 @@
+feature_set,model,strategy,held_out_cycle,n_iter,best_params,pr_auc,roc_auc,brier,prevalence,calibration_slope,calibration_intercept,citl_difference,citl_ratio_observed_expected,n_pos,n,train_prevalence,fit_seconds,run_hash
+A,ebm,none,2011-2012,5,"{'model__min_samples_leaf': 10, 'model__max_leaves': 2, 'model__learning_rate': 0.015, 'model__interactions': 10}",0.1057,0.7865,0.0330,0.0354,0.9783,0.2383,0.0088,1.3294,152,4288,0.0290,96.0736,60d32fd6d4ca5622
+A,ebm,none,2013-2014,5,"{'model__min_samples_leaf': 4, 'model__max_leaves': 2, 'model__learning_rate': 0.05, 'model__interactions': 10}",0.0876,0.7904,0.0268,0.0284,0.9475,-0.2078,-0.0015,0.9514,131,4607,0.0325,84.2409,60d32fd6d4ca5622
+A,ebm,none,2015-2016,5,"{'model__min_samples_leaf': 2, 'model__max_leaves': 2, 'model__learning_rate': 0.05, 'model__interactions': 0}",0.0760,0.7733,0.0283,0.0296,0.8677,-0.6046,-0.0073,0.8014,127,4294,0.0318,79.9957,60d32fd6d4ca5622
+A,logreg,none,2011-2012,5,{'model__C': 0.3},0.1030,0.7894,0.0332,0.0354,1.0141,0.3432,0.0086,1.3189,152,4288,0.0290,6.0031,60d32fd6d4ca5622
+A,logreg,none,2013-2014,5,{'model__C': 0.3},0.1014,0.7996,0.0266,0.0284,1.1593,0.3630,-0.0030,0.9047,131,4607,0.0325,5.9545,60d32fd6d4ca5622
+A,logreg,none,2015-2016,5,{'model__C': 0.3},0.0731,0.7595,0.0286,0.0296,0.8548,-0.6105,-0.0057,0.8375,127,4294,0.0318,6.3996,60d32fd6d4ca5622
+A,mlp,none,2011-2012,5,"{'model__lr': 0.001, 'model__hidden': (256, 128, 64), 'model__epochs': 20, 'model__dropout': 0.2}",0.1056,0.7845,0.0331,0.0354,0.6951,-0.5097,0.0121,1.5156,152,4288,0.0290,22.8504,60d32fd6d4ca5622
+A,mlp,none,2013-2014,5,"{'model__lr': 0.001, 'model__hidden': (256, 128, 64), 'model__epochs': 20, 'model__dropout': 0.2}",0.0879,0.7940,0.0268,0.0284,0.8456,-0.5875,-0.0047,0.8578,131,4607,0.0325,22.5841,60d32fd6d4ca5622
+A,mlp,none,2015-2016,5,"{'model__lr': 0.001, 'model__hidden': (256, 128, 64), 'model__epochs': 20, 'model__dropout': 0.2}",0.0681,0.7434,0.0292,0.0296,0.5756,-1.4329,-0.0095,0.7570,127,4294,0.0318,23.3561,60d32fd6d4ca5622
+A,xgboost,none,2011-2012,5,"{'model__n_estimators': 150, 'model__min_child_weight': 1, 'model__max_depth': 6, 'model__learning_rate': 0.02}",0.0923,0.7693,0.0333,0.0354,0.8806,-0.0072,0.0104,1.4165,152,4288,0.0290,8.5128,60d32fd6d4ca5622
+A,xgboost,none,2013-2014,5,"{'model__n_estimators': 150, 'model__min_child_weight': 1, 'model__max_depth': 3, 'model__learning_rate': 0.02}",0.0770,0.7864,0.0268,0.0284,1.1492,0.3793,-0.0019,0.9380,131,4607,0.0325,8.4151,60d32fd6d4ca5622
+A,xgboost,none,2015-2016,5,"{'model__n_estimators': 150, 'model__min_child_weight': 5, 'model__max_depth': 3, 'model__learning_rate': 0.05}",0.0735,0.7773,0.0286,0.0296,0.8032,-0.7901,-0.0080,0.7862,127,4294,0.0318,8.8665,60d32fd6d4ca5622
