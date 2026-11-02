@@ -1,0 +1,7 @@
+metric,female,male,female_minus_male,ci_low,ci_high,n_boot,label,run
+roc_auc,0.80331,0.80534,-0.00202,-0.03635,0.03407,1000,"development out-of-fold, exploratory",logreg__none__A
+pr_auc,0.09187,0.10531,-0.01344,-0.04959,0.01984,1000,"development out-of-fold, exploratory",logreg__none__A
+slope,0.96525,1.03983,-0.07458,-0.24303,0.10345,1000,"development out-of-fold, exploratory",logreg__none__A
+intercept,-0.11242,0.12265,-0.23507,-0.78599,0.32876,1000,"development out-of-fold, exploratory",logreg__none__A
+intercept_offset,-0.00939,0.00866,-0.01805,-0.22860,0.19039,1000,"development out-of-fold, exploratory",logreg__none__A
+oe,0.99138,1.00798,-0.01660,-0.20676,0.17435,1000,"development out-of-fold, exploratory",logreg__none__A
