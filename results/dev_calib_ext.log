@@ -1,0 +1,60 @@
+onehot_interactions: PR-AUC 0.1032 +/- 0.0129 (515s)
+group_recalibration: PR-AUC 0.1007 +/- 0.0151 (267s)
+onehot_main: PR-AUC 0.1039 +/- 0.0144 (268s)
+{
+  "primary_groups_covered": [
+    "Non-Hispanic Black",
+    "Other Hispanic"
+  ],
+  "primary_n_covered": 2,
+  "pr_auc_floor": 0.07846481185709402,
+  "candidates": {
+    "onehot_interactions": {
+      "groups_covered": [
+        "Mexican American",
+        "Non-Hispanic Asian",
+        "Non-Hispanic Black",
+        "Non-Hispanic White",
+        "Other Hispanic"
+      ],
+      "n_covered": 5,
+      "pr_auc_mean": 0.1031796593048693,
+      "more_groups": true,
+      "pr_auc_ok": true,
+      "qualifies": true
+    },
+    "group_recalibration": {
+      "groups_covered": [
+        "Mexican American",
+        "Non-Hispanic Asian",
+        "Non-Hispanic Black",
+        "Non-Hispanic White",
+        "Other Hispanic"
+      ],
+      "n_covered": 5,
+      "pr_auc_mean": 0.10071905425653684,
+      "more_groups": true,
+      "pr_auc_ok": true,
+      "qualifies": true
+    }
+  },
+  "adopted": "onehot_interactions",
+  "result": "adopt onehot_interactions (exploratory extension)",
+  "descriptive": {
+    "onehot_main": {
+      "groups_covered": [
+        "Mexican American",
+        "Non-Hispanic Asian",
+        "Non-Hispanic Black",
+        "Non-Hispanic White",
+        "Other Hispanic"
+      ],
+      "n_covered": 5,
+      "pr_auc_mean": 0.10391509873997164,
+      "more_groups": true,
+      "pr_auc_ok": true,
+      "qualifies": true
+    }
+  },
+  "label": "exploratory extension; primary model stays logistic regression on set A; not applied to 2017-2018 without a new deviation"
+}

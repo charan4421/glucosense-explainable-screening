@@ -1,0 +1,5 @@
+run,n_folds,pr_auc_mean,pr_auc_sd,roc_auc_mean,roc_auc_sd,brier_mean,brier_sd,calibration_slope_mean,calibration_slope_sd,calibration_intercept_mean,calibration_intercept_sd,citl_difference_mean,citl_difference_sd,citl_ratio_observed_expected_mean,citl_ratio_observed_expected_sd
+logreg__none__A,15,0.0938,0.0153,0.7829,0.0223,0.0294,0.0003,1.0707,0.2192,0.2227,0.6852,0.0001,0.0004,1.0024,0.0145
+onehot_interactions,15,0.1032,0.0129,0.8015,0.0216,0.0292,0.0004,0.9660,0.1134,-0.1012,0.3412,-0.0000,0.0006,0.9996,0.0187
+group_recalibration,15,0.1007,0.0151,0.7998,0.0269,0.0292,0.0003,1.0831,0.1981,0.2408,0.6162,-0.0003,0.0006,0.9903,0.0188
+onehot_main,15,0.1039,0.0144,0.8042,0.0227,0.0292,0.0004,1.0168,0.1225,0.0489,0.3714,0.0000,0.0006,1.0017,0.0197
