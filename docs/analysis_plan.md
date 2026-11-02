@@ -216,7 +216,9 @@ n_iter. A restart skips a combination only if the hash matches.
   sensitivity label only. Which instrument 2017-2018 used will be read from its documentation at
   test time, and the rule applied mechanically.
 - **The model:** the primary model on the primary set is refit on all 2011-2016 data with the
-  same tuning procedure, and scored **once** on 2017-2018. There is no retuning or feature change
+  same tuning procedure, and scored **once** on 2017-2018. After the encoding fix (Deviations,
+  2026-11-02) the selection rules, applied again, still pick logistic regression on set A; the
+  test model is that model **with one-hot encoded categorical inputs**, not the ordinal one. There is no retuning or feature change
   after seeing that cycle, and the **primary test result is uncalibrated**: the 2011-2016 model's
   predictions exactly as they come out.
 - **What the test reports** (added 2026-11-02, see Deviations):
@@ -233,9 +235,10 @@ n_iter. A restart skips a combination only if the hash matches.
     Both versions are reported side by side, with the uncalibrated one first.
 - **Expected performance:** test performance may well be lower than the development nested-CV
   estimate. The closest development analogue is leave-one-cycle-out with 2015-2016 held out,
-  the latest and weakest cycle for every model. For logistic regression on set A that gave
-  PR-AUC 0.073 (prevalence 3.0 %), ROC-AUC 0.760, O/E 0.84 and calibration intercept −0.61
-  (risk overpredicted), against nested-CV PR-AUC 0.094 and ROC-AUC 0.783. A drop of that size is
+  the latest and weakest cycle for every model. For the one-hot logistic regression on set A
+  that gave PR-AUC 0.079 (prevalence 3.0 %), ROC-AUC 0.773, O/E 0.79 and calibration intercept
+  −0.73 (risk overpredicted), against nested-CV PR-AUC 0.104 and ROC-AUC 0.805. (The ordinal
+  model gave 0.073, 0.760, 0.84 and −0.61, against 0.094 and 0.783.) A drop of that size is
   read as expected temporal drift, not as a failure of the analysis.
 - **If an item can't be reproduced in 2017-2018 with the same definition:**
   - This is expected for alcohol, whose questionnaire was redesigned in 2017. That is general

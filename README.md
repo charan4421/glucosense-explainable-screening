@@ -71,11 +71,29 @@ tests/        synthetic-data tests (no downloads needed)
 - **Sample vs population prevalence.** In the 2011-2016 development data the main label has a
   prevalence of 3.1 % unweighted but 2.1 % weighted. Unweighted PR-AUC, PPV and net benefit
   describe the NHANES sample, not the US adult population; read weighted PR-AUC against 2.1 %.
-- **Calibration differs by race/ethnicity.** Out-of-fold O/E for the primary model (logistic
-  regression, set A): 0.59 (95 % CI 0.48-0.70) in non-Hispanic White adults (risk overpredicted),
-  1.66 (1.31-2.08) in non-Hispanic Asian adults and 1.37 (1.06-1.68) in Mexican American adults
-  (underpredicted). Discrimination is similar across groups; a single risk threshold would not
-  mean the same thing in each.
+- **Calibration by race/ethnicity: the gap came from an encoding error.** Logistic regression
+  first received race/ethnicity (and, in sets B-D, smoking and drinking status) as one ordinal
+  code, so it fitted a single slope across nominal groups. The development subgroup analysis
+  exposed it; it was fixed by one-hot encoding before the test (docs/analysis_plan.md,
+  Deviations 2026-11-02), and the selection rules, applied again, still pick logistic
+  regression on set A. Out-of-fold O/E for that model (95 % bootstrap CI, 1000 resamples within
+  group; old results in `results/archive_v2_ordinal_logreg/`):
+
+  | Group (positives) | O/E, ordinal (before) | O/E, one-hot (after) |
+  |---|---|---|
+  | Non-Hispanic White (94) | 0.59 (0.48-0.71) | 0.97 (0.79-1.17) |
+  | Non-Hispanic Asian (65) | 1.66 (1.31-2.08) | 1.04 (0.82-1.30) |
+  | Non-Hispanic Black (116) | 1.15 (0.96-1.37) | 1.00 (0.83-1.19) |
+  | Mexican American (72) | 1.37 (1.06-1.68) | 1.01 (0.78-1.24) |
+  | Other Hispanic (53) | 1.28 (0.96-1.64) | 1.02 (0.77-1.30) |
+  | CI includes 1 | 2 of 5 groups | 5 of 5 groups |
+  | Nested-CV PR-AUC / ROC-AUC (all) | 0.094 / 0.783 | 0.104 / 0.805 |
+
+  "Other / multiracial" (10 positives) is too small to judge. The intervals are wide (about 20-25 %
+  either side) and ignore the survey design, so this shows the gross
+  miscalibration is gone, not that calibration is equal across groups. Group-wise
+  recalibration was dropped as no longer needed. The MLP also received ordinal codes and was
+  not refit; it is never the primary model.
 - **Label based on HbA1c only.** The main label is HbA1c ≥ 6.5 % from a single measurement, with
   no confirmatory test. HbA1c misses some cases that fasting glucose or an OGTT would find, and
   differs by race/ethnicity and with anaemia or haemoglobin variants. HbA1c-or-FPG on the
