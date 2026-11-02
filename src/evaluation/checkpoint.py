@@ -24,15 +24,18 @@ def run_hash(cfg: dict, seed: int, n_iter: int) -> str:
 
 
 def combo_hash(cfg: dict, feats: list[str], categorical: list[str], n_iter: int,
-               data_path: str | Path) -> str:
+               data_path: str | Path, encoding: str = "ordinal") -> str:
     """Hash of everything that changes one combination's result: data file content, sample/CV/
     preprocessing settings, the resolved feature list, seed and n_iter. Unlike run_hash it does
     not depend on unrelated config (other sets, the design list), so adding work elsewhere
-    never invalidates finished combinations."""
+    never invalidates finished combinations. A non-default categorical encoding is part of
+    the hash; the default (ordinal) is left out so existing hashes stay valid."""
     digest = hashlib.sha256(Path(data_path).read_bytes()).hexdigest()
     relevant = {"data_sha256": digest, "cv": cfg["cv"], "preprocessing": cfg["preprocessing"],
                 "interactions": cfg["features"]["interactions"], "features": list(feats),
                 "categorical": list(categorical)}
+    if encoding != "ordinal":
+        relevant["categorical_encoding"] = encoding
     return run_hash(relevant, cfg["seed"], n_iter)
 
 

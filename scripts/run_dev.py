@@ -47,6 +47,7 @@ from src.evaluation.selection import (  # noqa: E402
     selection_record,
 )
 from src.evaluation.temporal import feature_set  # noqa: E402
+from src.models.models import categorical_encoding  # noqa: E402
 
 OUT = Path("results/dev_cv_v2")
 LOCO_DIR = OUT / "loco"
@@ -68,7 +69,8 @@ def load_dev(cfg: dict) -> pd.DataFrame:
 
 def run_combo(cfg, df, model, strategy, set_name, n_iter, base=None, dry=False, stage="main"):
     feats, cat = feature_set(cfg, set_name, base)
-    h = combo_hash(cfg, feats, cat, n_iter, cfg["data"]["dev_processed_path"])
+    h = combo_hash(cfg, feats, cat, n_iter, cfg["data"]["dev_processed_path"],
+                   categorical_encoding(model))
     out_dir = LOCO_DIR if stage == "loco" else OUT
     path = combo_path(out_dir, model, strategy, set_name)
     tag = f"[{stage}] {model} / {strategy} / set {set_name} ({len(feats)} features)"

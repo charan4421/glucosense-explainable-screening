@@ -148,6 +148,15 @@ LOGREG_SPACE = {"model__C": [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0,
 # Models that take the raw feature frame and have nothing to tune (no preprocessing, no search).
 RAW_INPUT_MODELS = {"ada_style"}
 
+# Models whose categorical inputs are one-hot encoded. A linear model cannot use an ordinal code
+# of a nominal variable (one slope over arbitrary codes); trees and EBM split it. Deviation
+# 2026-11-02 in docs/analysis_plan.md.
+ONEHOT_MODELS = {"logreg"}
+
+
+def categorical_encoding(name: str) -> str:
+    return "onehot" if name in ONEHOT_MODELS else "ordinal"
+
 
 # EBM: 8 outer bags (default 14) on 2 parallel jobs to fit this PC (8 GB RAM); the number of pairwise
 # interactions is tuned because it dominates fit time (0 interactions ~4 s, 3x default ~1 min).

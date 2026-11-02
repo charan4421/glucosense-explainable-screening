@@ -11,7 +11,7 @@ import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV, RepeatedStratifiedKFold, StratifiedKFold
 
 from src.evaluation.metrics import calibration_stats, summarize
-from src.models.models import RAW_INPUT_MODELS, get_model
+from src.models.models import RAW_INPUT_MODELS, categorical_encoding, get_model
 from src.preprocessing.pipeline import build_model_pipeline
 
 
@@ -56,7 +56,8 @@ def nested_cv(X: pd.DataFrame, y, model_name: str, strategy: str, categorical: l
         else:
             pipe = (make_pipeline(X.iloc[tr], model) if make_pipeline else
                     build_model_pipeline(X.iloc[tr], model, categorical, strategy_here,
-                                         knn_neighbors, interactions, seed))
+                                         knn_neighbors, interactions, seed,
+                                         categorical_encoding(model_name)))
             search = RandomizedSearchCV(pipe, space, n_iter=n_iter, cv=inner, scoring=scoring,
                                         random_state=seed, n_jobs=1, refit=True)
             search.fit(X.iloc[tr], y[tr])

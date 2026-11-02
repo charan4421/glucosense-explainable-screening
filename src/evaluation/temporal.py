@@ -10,7 +10,7 @@ from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 
 from src.data.nhanes import MAIN_LABEL, SENS_LABEL
 from src.evaluation.metrics import summarize
-from src.models.models import get_model
+from src.models.models import categorical_encoding, get_model
 from src.preprocessing.pipeline import build_model_pipeline
 
 # Raw NHANES lab columns and every label derived from them.
@@ -70,7 +70,8 @@ def temporal_evaluate(df: pd.DataFrame, feats: list[str], categorical: list[str]
     model, space = get_model(model_name, seed)
     pipe = build_model_pipeline(train[feats], model, categorical, strategy,
                                 cfg["preprocessing"]["knn_neighbors"],
-                                cfg["features"]["interactions"], seed)
+                                cfg["features"]["interactions"], seed,
+                                categorical_encoding(model_name))
     search = RandomizedSearchCV(pipe, space, n_iter=cv["n_iter"],
                                 cv=StratifiedKFold(cv["inner_folds"], shuffle=True, random_state=seed),
                                 scoring=cv["scoring"], random_state=seed, n_jobs=1, refit=True)

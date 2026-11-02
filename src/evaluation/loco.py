@@ -11,7 +11,7 @@ import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 
 from src.evaluation.metrics import calibration_stats, summarize
-from src.models.models import RAW_INPUT_MODELS, get_model
+from src.models.models import RAW_INPUT_MODELS, categorical_encoding, get_model
 from src.preprocessing.pipeline import build_model_pipeline
 
 
@@ -29,7 +29,8 @@ def loco(df: pd.DataFrame, feats: list[str], categorical: list[str], target: str
         else:
             pipe = build_model_pipeline(train[feats], model, categorical, strategy,
                                         cfg["preprocessing"]["knn_neighbors"],
-                                        cfg["features"]["interactions"], seed)
+                                        cfg["features"]["interactions"], seed,
+                                        categorical_encoding(model_name))
             search = RandomizedSearchCV(
                 pipe, space, n_iter=n_iter, scoring=cv["scoring"], random_state=seed, n_jobs=1,
                 cv=StratifiedKFold(cv["inner_folds"], shuffle=True, random_state=seed), refit=True)

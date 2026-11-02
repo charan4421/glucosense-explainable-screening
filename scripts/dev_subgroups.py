@@ -22,6 +22,7 @@ from src.data.nhanes import MAIN_LABEL  # noqa: E402
 from src.evaluation.checkpoint import combo_hash, load_oof  # noqa: E402
 from src.evaluation.subgroups import RACE_ETH, subgroup_table  # noqa: E402
 from src.evaluation.temporal import feature_set  # noqa: E402
+from src.models.models import categorical_encoding  # noqa: E402
 
 SELECTION = Path("results/dev_cv_v2_selection.json")
 
@@ -37,7 +38,8 @@ def load_dev_oof(cfg: dict, run: str):
     model, strategy, set_name = run.split("__")
     base = json.loads(SELECTION.read_text())["d_base"] if set_name == "D" else None
     feats, cat = feature_set(cfg, set_name, base)
-    h = combo_hash(cfg, feats, cat, cfg["cv"]["n_iter"], cfg["data"]["dev_processed_path"])
+    h = combo_hash(cfg, feats, cat, cfg["cv"]["n_iter"], cfg["data"]["dev_processed_path"],
+                   categorical_encoding(model))
     dev = load_dev(cfg)
     path = OOF_DIR / f"{run}.csv"
     oof = load_oof(path, h)
