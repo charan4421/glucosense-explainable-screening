@@ -419,3 +419,36 @@ n_iter. A restart skips a combination only if the hash matches.
     - **Framing:** the counterfactuals explain the model. They are not clinical advice or causal
       claims, and every output file says so.
   - **Output:** `results/dev_cv_v2_explain/`.
+
+- **2026-11-02: specification error fixed: categorical inputs one-hot encoded in logistic
+  regression.** Written before any rerun. Found after seeing development results and before the
+  test; development data only; 2017-2018 has not been read.
+  - **Error:** every categorical input went through `OrdinalEncoder`, so logistic regression
+    treated a nominal variable as one numeric column with a single slope. For race/ethnicity the
+    codes are NHANES 1, 2, 3, 4, 6, 7 mapped to 0-5. In sets B-D the same applies to
+    `smoking_status` and `drinking_status`, whose codes follow alphabetical order
+    (current < former < never; current < former < lifetime abstainer).
+  - **How it was found:** the development subgroup analysis (O/E by race/ethnicity: non-Hispanic
+    White 0.59, non-Hispanic Asian 1.66, Mexican American 1.37), and the exploratory extension A,
+    where one-hot race main effects alone brought the O/E 95 % CI to include 1 for all five
+    reliable groups (PR-AUC 0.1039 vs 0.0938).
+  - **Fix:** for logistic regression only, categorical inputs are one-hot encoded
+    (`OneHotEncoder`, binary items kept as one 0/1 column, unseen levels ignored) after the same
+    most-frequent imputation. Binary items (sex, family history, ever smoked) are unchanged in
+    effect. Everything else (folds, tuning, budget, features, preprocessing) is unchanged.
+  - **Scope:** tree models and EBM split the code, so they are not refit. The MLP also receives
+    ordinal codes; it is never the primary model and is not refit, and this is reported as a
+    limitation. TabNet uses its own embedding path and is not affected in the same way.
+  - **Rerun:** logistic regression on sets A-D and in LOCO, with the encoding recorded in the
+    checkpoint hash (only for one-hot models, so other combinations stay valid). The ordinal
+    results are kept in `results/archive_v2_ordinal_logreg/`. **The pre-specified selection
+    rules (section 6) are applied again unchanged, and the outcome is reported whether or not
+    the pick changes.** If the base of set D or the primary set changes, the stages that depend
+    on them rerun by rule.
+  - **Downstream:** the primary-model analyses (weighted metrics, decision curve, subgroups,
+    explanation analysis B including DiCE) are rerun for the resulting primary model. In DiCE the
+    race/ethnicity input stays immutable; as explanations are on raw inputs, that holds every
+    one-hot race column fixed.
+  - **Extension A:** candidate (ii), group-wise intercept recalibration, is dropped. With the
+    encoding fixed, adjusting risk by race/ethnicity after the fact is not needed. Its committed
+    results stay as a record.
