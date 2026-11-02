@@ -1,0 +1,128 @@
+{
+  "git": {
+    "commit": "67950669ac18963a9f1908fcd6cc28ac009d4991",
+    "tree": "7c9a796633d7c1148716dd1215b91c537d25ad36",
+    "tag_commit": "67950669ac18963a9f1908fcd6cc28ac009d4991",
+    "dirty": ""
+  },
+  "hashes": {
+    "config": "a75d59979fdb9db194ee0498c97cce46804be952b0bdb5653bc9b5ad8556b68a",
+    "code": "ce7ae02a4912b2ae3d1b9a0dd38ba000e5c8ea4d8377e071e8c2f3295b388069",
+    "dev_data": "21d5c34e908fdf824f0354318a1fc96527719ab098c0fb7f6da7c5f1496434b0",
+    "test_data": "627606a4785f0cab5be6333ca1198cc3bcb48db12808552ebf86ffdb19842326",
+    "test_raw": {
+      "ALQ_J.XPT": "53006d407764ad16491f823d25f2781ba55363aee9cb304d3f5d9450cf25d5c1",
+      "BMX_J.XPT": "8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a",
+      "BPQ_J.XPT": "63cfe1c331a1e7d3534328ac86312a21ffee3e01aa189bc1f74d06855239e5aa",
+      "BPX_J.XPT": "f98f1d9a4c18173e715c749b4294f6f1525140d5ad5751316bb17cc038fb3423",
+      "DBQ_J.XPT": "1c365d7f4696c161a7a9726aac6d696e63978f64632e3ce08e5eb13e294a138d",
+      "DEMO_J.XPT": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec",
+      "DIQ_J.XPT": "1ecbf5360dfc331d1efbf32198553dc30e9a1f4cff0a907ed30ca72bac797f89",
+      "DR1TOT_J.XPT": "390ae5205acfbcb87e0ca3d9aabd1c801b60657d3f2802ac08d5b3ed93f0af6d",
+      "FSQ_J.XPT": "b601f31463be283720a5cd4352cd6a533e3a97c37a3e91a00cb301d8b483571a",
+      "GHB_J.XPT": "35f07094573a0061a03ed609a5a363b34eb1b1c7065d1623b43d72e132a8a654",
+      "GLU_J.XPT": "5b38897d0d7bfbc69dd9ca74ffdaf2f6a9bed5a91d4a7bf46e07f1332cc3379e",
+      "HIQ_J.XPT": "96dfdd98507ea6dc67cb2c2b6999da3c035f3f8a9a87cf34756fe30762387860",
+      "HUQ_J.XPT": "0d8814ca6a72c003eb89885a3a24dcff3b475dfed454089cf4890f9ab9da06d2",
+      "MCQ_J.XPT": "79c50c805a377fcd61d44fae8b86a16af0a5741f8b1aeebda918d7d743c68f98",
+      "PAQ_J.XPT": "048120aa3a5c8b5cd457ad3e13dfd62d728b12ea6644960e933ad374ec907e79",
+      "RHQ_J.XPT": "c919896216154ea207470dd84e428f5fdd65ced39735148c78fb6032e0b77a7b",
+      "SLQ_J.XPT": "5486e1c51d56a959c94106d131a11b2e58bdec8ff30917ad7748917c6fa09f3a",
+      "SMQ_J.XPT": "73c3708e540cbf520a566508aa629c3e4ba53cad77dae9388ca36384646455f4",
+      "WHQ_J.XPT": "7e1037070a4cc89d29a0f083e21f2ded15003d3d2dfbcf182dfd1df7282ea3d4"
+    }
+  },
+  "n_dev": 13189,
+  "dev_positives": 410,
+  "models": {
+    "logreg__none__A": {
+      "role": "primary",
+      "set": "A",
+      "n_features": 10,
+      "encoding": "onehot",
+      "settings_hash": "7e8d3481c8be1f28",
+      "best_params": "{'model__C': 0.3}",
+      "model_sha256": "954a99a63c0c4fe3f34bf4ff758e608f77577ba3fe517ba1e7d78e0443277199",
+      "dev_prediction_sha256": "c441a0d32e20566fd867b149e46b8ee86d91657f5aed3a91336258bbfd698ae1",
+      "dev_apparent": {
+        "pr_auc": 0.10304986627894637,
+        "roc_auc": 0.8127310622038062,
+        "brier": 0.029011296557394716,
+        "prevalence": 0.0310865114868451
+      },
+      "dev_nested_cv": {
+        "pr_auc_mean": 0.1041,
+        "pr_auc_sd": 0.0142,
+        "roc_auc_mean": 0.8045,
+        "roc_auc_sd": 0.0216,
+        "brier_mean": 0.0292,
+        "calibration_slope_mean": 1.0047,
+        "calibration_intercept_mean": 0.0118,
+        "citl_ratio_observed_expected_mean": 1.0004
+      }
+    },
+    "ebm__none__B": {
+      "role": "secondary",
+      "set": "B",
+      "n_features": 40,
+      "encoding": "ordinal",
+      "settings_hash": "6f8d1c1130e8623a",
+      "best_params": "{'model__min_samples_leaf': 2, 'model__max_leaves': 2, 'model__learning_rate': 0.05, 'model__interactions': 0}",
+      "model_sha256": "791f6f69c47bfb5d996c886ec6c05d3f077b3cb531205a5dc85f5f8600f7d750",
+      "dev_prediction_sha256": "a65977075fa4f3d9b57f9082c37410a0aa52ccaff33c2ebc908ad79143a70f88",
+      "dev_apparent": {
+        "pr_auc": 0.1564262167248305,
+        "roc_auc": 0.8394057323467043,
+        "brier": 0.028082358140059258,
+        "prevalence": 0.0310865114868451
+      },
+      "dev_nested_cv": {
+        "pr_auc_mean": 0.1122,
+        "pr_auc_sd": 0.0209,
+        "roc_auc_mean": 0.8001,
+        "roc_auc_sd": 0.0198,
+        "brier_mean": 0.0289,
+        "calibration_slope_mean": 0.9844,
+        "calibration_intercept_mean": -0.0415,
+        "citl_ratio_observed_expected_mean": 1.0055
+      }
+    },
+    "ada_style__none__A": {
+      "role": "secondary (comparator)",
+      "set": "A",
+      "n_features": 10,
+      "encoding": "ordinal",
+      "settings_hash": "60d32fd6d4ca5622",
+      "best_params": "{}",
+      "model_sha256": "e46ee19f6f6e626d9eb8e5593368cb82df3a258c7856eeee5147a793a204dcd9",
+      "dev_prediction_sha256": "7e64cc14e656245457a3a6d0bc6213ee28fb37d7a7e4a248576c2db82c9edba6",
+      "dev_apparent": {
+        "pr_auc": 0.0751860722941112,
+        "roc_auc": 0.7494829550768315,
+        "brier": 0.029318189623581466,
+        "prevalence": 0.0310865114868451
+      },
+      "dev_nested_cv": {
+        "pr_auc_mean": 0.07888716947378514,
+        "pr_auc_sd": 0.011151956285577186,
+        "roc_auc_mean": 0.7493756992587245,
+        "roc_auc_sd": 0.020143855239096068,
+        "brier_mean": 0.029322570471917418,
+        "calibration_slope_mean": 1.0076065037641535,
+        "calibration_intercept_mean": 0.020618844495723373,
+        "citl_ratio_observed_expected_mean": 0.9996139287138636
+      }
+    }
+  },
+  "score": {
+    "git": {
+      "commit": "67950669ac18963a9f1908fcd6cc28ac009d4991",
+      "tree": "7c9a796633d7c1148716dd1215b91c537d25ad36",
+      "tag_commit": "67950669ac18963a9f1908fcd6cc28ac009d4991",
+      "dirty": "?? results/test_2017_2018/"
+    },
+    "n_test": 4095,
+    "n_boot": 1000,
+    "seed": 42
+  }
+}

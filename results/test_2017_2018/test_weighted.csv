@@ -1,0 +1,4 @@
+run,role,weighting,weighted_prevalence,pr_auc,pr_auc_ci_low,pr_auc_ci_high,roc_auc,roc_auc_ci_low,roc_auc_ci_high,n_boot,n_boot_skipped
+logreg__none__A,secondary (survey-weighted),WTMEC2YR,0.02461,0.08163,0.06318,0.11416,0.79867,0.75087,0.84621,1000,0
+ebm__none__B,secondary (survey-weighted),WTMEC2YR,0.02461,0.07829,0.05989,0.11323,0.78315,0.74087,0.82620,1000,0
+ada_style__none__A,secondary (survey-weighted),WTMEC2YR,0.02461,0.04788,0.03595,0.06450,0.72708,0.68429,0.76824,1000,0
