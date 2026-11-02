@@ -18,6 +18,24 @@ Calibrated, explainable screening for **undiagnosed diabetes** from non-laborato
 - **Metrics:** PR-AUC (primary), ROC-AUC, Brier score, calibration curve, Decision Curve Analysis.
 - **Explainability:** SHAP (global + local), LIME consistency check, DiCE counterfactuals with immutable features.
 
+## Demo (one command, no data download)
+
+```bash
+pip install -r requirements.txt
+python scripts/demo.py                                # scores the fictional examples/sample_patient.json
+python scripts/demo.py --patient my_patient.json      # your own 10 set-A inputs
+```
+
+The demo uses `models/primary_logreg_A.json`, a portable copy of the frozen primary model:
+aggregate parameters and coefficients only, with no NHANES records.
+- `scripts/export_demo_model.py` wrote it from the saved model, after checking the model's
+  sha256 against the test run log.
+- On all 12,240 complete development rows its predictions match the original to 1e-16.
+- It needs every numeric input.
+
+It is a research demo, not a diagnosis. See `docs/model_card.md`, `docs/tripod_ai_checklist.md`
+and `LICENSE`, which covers the code only (MIT); NHANES data are public and not redistributed.
+
 ## Quick start
 
 ```bash
@@ -146,9 +164,23 @@ no model fitted, refitted or rescored. Bootstrap: 1000 resamples, seed 42.
 | Primary − ADA-style, PR-AUC (unweighted) | 0.035 | 0.023 to 0.057 |
 | Primary − ADA-style, ROC-AUC (weighted) | 0.072 | 0.036 to 0.109 |
 | Primary − ADA-style, PR-AUC (weighted) | 0.034 | 0.019 to 0.061 |
-| Women − men, ROC-AUC | 0.089 | 0.022 to 0.154 |
-| Women − men, PR-AUC | 0.077 | 0.025 to 0.150 |
-| Women − men, calibration slope | 0.34 | 0.06 to 0.63 |
+
+**Women vs men, primary model.** The development column (`scripts/dev_sex_gap.py`,
+`results/dev_cv_v2_sex_gap/`) uses nested-CV out-of-fold predictions on 2011-2016 only, with the
+same within-sex bootstrap as the test.
+
+| | Dev 2011-2016 (out-of-fold) | Test 2017-2018 |
+|---|---|---|
+| Positives: women / men | 195 / 215 | 90 / 67 |
+| ROC-AUC, women | 0.803 (0.774-0.828) | 0.819 (0.783-0.856) |
+| ROC-AUC, men | 0.805 (0.783-0.828) | 0.730 (0.674-0.782) |
+| **ROC-AUC, women − men** | **−0.002 (−0.036 to 0.034)** | **+0.089 (0.022 to 0.154)** |
+| PR-AUC, women | 0.092 (0.074-0.119) | 0.151 (0.110-0.222) |
+| PR-AUC, men | 0.105 (0.085-0.135) | 0.075 (0.054-0.108) |
+| **PR-AUC, women − men** | **−0.013 (−0.050 to 0.020)** | **+0.077 (0.025 to 0.150)** |
+| Calibration slope, women − men | −0.07 (−0.24 to 0.10) | +0.34 (0.06 to 0.63) |
+
+In development there was no gap between women and men; it appeared only in 2017-2018.
 
 - **Calibration by sex:** O/E was 1.14 for women (0.90–1.37) and 0.83 for men (0.64–1.02).
 - **In men:** predicted risks in the top fifth averaged 11.7 %, against 8.2 % observed, so risks were too high at the top. In the second fifth they were 1.3 % predicted against 2.8 % observed, so too low at the low end.
