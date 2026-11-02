@@ -216,8 +216,27 @@ n_iter. A restart skips a combination only if the hash matches.
   sensitivity label only. Which instrument 2017-2018 used will be read from its documentation at
   test time, and the rule applied mechanically.
 - **The model:** the primary model on the primary set is refit on all 2011-2016 data with the
-  same tuning procedure, and scored **once** on 2017-2018. There is no retuning, recalibration or
-  feature change after seeing that cycle.
+  same tuning procedure, and scored **once** on 2017-2018. There is no retuning or feature change
+  after seeing that cycle, and the **primary test result is uncalibrated**: the 2011-2016 model's
+  predictions exactly as they come out.
+- **What the test reports** (added 2026-11-02, see Deviations):
+  - **Unweighted (primary):** PR-AUC (with the 2017-2018 prevalence), ROC-AUC, Brier,
+    calibration slope and intercept, O/E, and the decision curve over the 1-5 % window, with
+    bootstrap 95 % intervals (1000 resamples, seed 42).
+  - **Survey-weighted (secondary):** ROC-AUC and PR-AUC weighted with the 2017-2018 2-year MEC
+    weight (WTMEC2YR, one cycle, so not divided), with the weighted prevalence and the same
+    bootstrap. Like the development analysis, the intervals ignore strata and PSUs.
+  - **Intercept-recalibrated (secondary):** the intercept is re-estimated on 2017-2018 with the
+    slope fixed at 1 (logit p as offset). This uses the test outcomes, so it shows what a local
+    intercept update would give, not an independent estimate. It changes calibration-in-the-large,
+    O/E, Brier and net benefit; ROC-AUC and PR-AUC do not change, because the ranking does not.
+    Both versions are reported side by side, with the uncalibrated one first.
+- **Expected performance:** test performance may well be lower than the development nested-CV
+  estimate. The closest development analogue is leave-one-cycle-out with 2015-2016 held out,
+  the latest and weakest cycle for every model. For logistic regression on set A that gave
+  PR-AUC 0.073 (prevalence 3.0 %), ROC-AUC 0.760, O/E 0.84 and calibration intercept −0.61
+  (risk overpredicted), against nested-CV PR-AUC 0.094 and ROC-AUC 0.783. A drop of that size is
+  read as expected temporal drift, not as a failure of the analysis.
 - **If an item can't be reproduced in 2017-2018 with the same definition:**
   - This is expected for alcohol, whose questionnaire was redesigned in 2017. That is general
     knowledge, not yet verified, because the cycle was not opened.
@@ -299,3 +318,14 @@ n_iter. A restart skips a combination only if the hash matches.
     every combination on its hash; summary, paired and LOCO files came out byte-identical.
     Set rule: best EBM / C 0.1128, SD 0.0182, threshold 0.0947 → primary set A (best 0.0964).
     Model rule on A: best EBM 0.0964, SD 0.0116, threshold 0.0848 → logistic regression (0.0938).
+
+- **2026-11-02: section 9 extended before 2017-2018 was opened.**
+  - **Added:** survey-weighted ROC-AUC and PR-AUC as a secondary test result (unweighted stays
+    primary); an intercept-recalibrated result reported next to the uncalibrated primary one; and
+    the stated expectation that test performance may be lower than development, anchored on the
+    2015-2016 leave-one-cycle-out result.
+  - **Changed wording:** "no recalibration" now means the primary result is uncalibrated. The
+    recalibrated result is a labelled secondary analysis that uses the test outcomes.
+  - **Why:** the development analysis now reports weighted discrimination (deviation above) and
+    the 2015-2016 held-out cycle showed overprediction, so both are fixed for the test before it
+    is run. 2017-2018 has not been read.
