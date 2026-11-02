@@ -455,3 +455,56 @@ n_iter. A restart skips a combination only if the hash matches.
   - **Extension A:** candidate (ii), group-wise intercept recalibration, is dropped. With the
     encoding fixed, adjusting risk by race/ethnicity after the fact is not needed. Its committed
     results stay as a record.
+- **2026-11-02: test protocol, written before 2017-2018 is scored.** Nothing from the v2
+  build of 2017-2018 has been scored or looked at. Only its file and column names were read
+  (to check item mappings) and its glucose documentation (section 9 FPG rule).
+  - **Disclosure: earlier use of 2017-2018.** Before this plan existed, the v1 pipeline ran one
+    temporal test (commit `df1b305`, `results/temporal_test.csv`). It used XGBoost (no
+    rebalancing) on set A, with v1 rules (no pregnancy exclusion, XPT zero bug), and gave n
+    4,138, prevalence 3.8 %, PR-AUC 0.101 and ROC-AUC 0.776. So the cycle's approximate
+    prevalence and one model's performance on it were known before the plan. No selection rule
+    used them. The test below is the first and only scoring of the pre-specified v2 model, but
+    not the first look at the cycle, and this is reported as a limitation.
+  - **Additions, all secondary and labelled as such (requested after section 9 was written,
+    added before scoring):**
+    - Subgroup tables (sex, race/ethnicity) for the primary model, as in development: within-group
+      bootstrap (1000 resamples, seed 42), with groups under 30 positives flagged unreliable.
+    - Bootstrap 95 % intervals also for calibration slope, intercept and O/E, on the same
+      resamples as PR-AUC, ROC-AUC and Brier.
+    - **EBM on set B** (the secondary model of explanation analysis B), refit on all of 2011-2016
+      with the same procedure, and reported with the same unweighted metrics, weighted ROC/PR-AUC
+      and decision curve. It never replaces the primary model.
+    - **The ADA-style score** (`src/models/ada_style.py`): fixed points from set A inputs, with
+      the points→risk mapping fitted on 2011-2016. It is a comparator. It was not run in the v2
+      development analysis, so its development reference is a nested CV on 2011-2016 with the
+      same folds, run in the fit stage before any test data is loaded.
+    - The intercept-recalibrated version (section 9) is reported for the primary model only. In
+      its bootstrap the intercept is re-estimated in every resample.
+  - **2017-2018 build:** `python -m src.data.nhanes --test` writes
+    `data/processed/nhanes_test.parquet` with the same exclusions, labels, derived variables
+    and caps. The development build still refuses the test cycle.
+    - **FPG rule, read from the GLU_J documentation:** "The Cobas C311 analyzer was used in
+      2017-2018 and 2015-2016". So the same backward equation is applied mechanically, for the
+      sensitivity label only. The test does not report the sensitivity label.
+  - **Item mapping (section 9):**
+    - **Alcohol:** the 2017 questionnaire replaced ALQ101/110/120/141 with
+      ALQ111/121/142, which have different definitions: "ever had a drink" instead of 12 drinks
+      in a lifetime or a year, a categorical frequency, and binge at 4+ drinks for women.
+      `drinks_per_week`, `binge_days_per_year` and `drinking_status` cannot be reproduced with
+      the same definition. They are left missing and imputed by the training-fitted imputers.
+      This affects EBM / B only, not set A or the ADA-style score.
+    - **Sleep hours and healthcare visits:** these use the existing harmonisation (SLD012,
+      HUQ051).
+    - **Other items** keep their 2011-2016 names. Their codes are assumed unchanged, and not
+      every 2017-2018 codebook was re-checked.
+  - **Procedure:**
+    - The working tree is clean and the commit is tagged `pre-test`.
+    - `scripts/run_test.py --stage fit` refits the models on 2011-2016 only (no test data
+      loaded) and records the hashes in the run log: the commit, the code tree, the config, the
+      development and test data, the 2017-2018 raw files, and the fitted models.
+    - `--stage score` loads 2017-2018 and scores **once**. It refuses to run if the tree is
+      dirty, if the tag does not match the commit, if the hashes differ from the run log, or if
+      the output folder already exists.
+    - Nothing is rerun or edited after the results are seen. Anything that looks wrong is
+      reported as a post-test finding.
+    - Output: `results/test_2017_2018/`.
