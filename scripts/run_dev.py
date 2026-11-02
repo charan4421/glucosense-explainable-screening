@@ -40,7 +40,12 @@ from src.evaluation.checkpoint import (  # noqa: E402
 from src.evaluation.compare import comparison_table  # noqa: E402
 from src.evaluation.loco import loco  # noqa: E402
 from src.evaluation.nested_cv import nested_cv  # noqa: E402
-from src.evaluation.selection import base_for_d, primary_model, primary_set  # noqa: E402
+from src.evaluation.selection import (  # noqa: E402
+    base_for_d,
+    primary_model,
+    primary_set,
+    selection_record,
+)
 from src.evaluation.temporal import feature_set  # noqa: E402
 
 OUT = Path("results/dev_cv_v2")
@@ -101,7 +106,7 @@ def main(cfg_path: str, stages: list[str], dry: bool) -> None:
           f"positives={int(df[MAIN_LABEL].sum())}; {cfg['data']['temporal_test_cycle']} not loaded",
           flush=True)
     order = sorted(des["main_models"], key=["logreg", "xgboost", "mlp", "ebm"].index)
-    selection = {}
+    d_base = None
 
     if "main" in stages:
         for model in order:
@@ -112,15 +117,13 @@ def main(cfg_path: str, stages: list[str], dry: bool) -> None:
     summary = build_summary(OUT, SUMMARY)
 
     if "d" in stages:
-        base = base_for_d(summary, des["main_models"])
-        selection["d_base"] = base
+        d_base = base_for_d(summary, des["main_models"])
         for model in order:
-            run_combo(cfg, df, model, "none", "D", n_iter, base=base)
+            run_combo(cfg, df, model, "none", "D", n_iter, base=d_base)
         summary = build_summary(OUT, SUMMARY)
 
     if "loco" in stages:
         ps = primary_set(summary, des["main_models"])
-        selection.update(ps)
         for model in order:
             run_combo(cfg, df, model, "none", ps["primary_set"], n_iter, stage="loco")
 
@@ -131,10 +134,9 @@ def main(cfg_path: str, stages: list[str], dry: bool) -> None:
 
     ps = primary_set(summary, des["main_models"])
     pm = primary_model(summary, ps["primary_set"], des["simplicity_order"])
-    selection.update({**ps, **pm})
+    selection = selection_record(ps, pm, d_base)
     Path("results/dev_cv_v2_selection.json").write_text(
-        json.dumps({k: (float(v) if hasattr(v, "item") else v) for k, v in selection.items()},
-                   indent=2))
+        json.dumps(selection, indent=2, default=float))
     folds = pd.concat([pd.read_csv(f) for f in sorted(OUT.glob("*__*.csv"))], ignore_index=True)
     sets = [s for s in ["A", "B", "C", "D"] if s in set(folds.feature_set)]
     comparison_table(folds, des["main_models"], sets, cfg["cv"]["outer_folds"]).to_csv(

@@ -1,10 +1,21 @@
 {
-  "d_base": "C",
   "primary_set": "A",
-  "best_set": "C",
-  "best_model": "ebm",
-  "best_pr_auc": 0.09638014999820206,
-  "best_pr_auc_sd": 0.011622213025412218,
-  "threshold": 0.08475793697278984,
-  "primary_model": "logreg"
+  "primary_model": "logreg",
+  "d_base": "C",
+  "set_rule": {
+    "primary_set": "A",
+    "best_set": "C",
+    "best_model": "ebm",
+    "best_pr_auc": 0.112849108661718,
+    "best_pr_auc_sd": 0.018180956499423598,
+    "threshold": 0.0946681521622944
+  },
+  "model_rule": {
+    "feature_set": "A",
+    "primary_model": "logreg",
+    "best_model": "ebm",
+    "best_pr_auc": 0.09638014999820206,
+    "best_pr_auc_sd": 0.011622213025412218,
+    "threshold": 0.08475793697278984
+  }
 }

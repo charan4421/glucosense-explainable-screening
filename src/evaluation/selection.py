@@ -41,6 +41,16 @@ def primary_model(summary: pd.DataFrame, feature_set: str, simplicity_order: lis
             "best_pr_auc_sd": m.loc[top, "pr_auc_sd"], "threshold": threshold}
 
 
+def selection_record(ps: dict, pm: dict, d_base: str | None = None) -> dict:
+    """Outcome of both rules for results/dev_cv_v2_selection.json. The two rules return keys with
+    the same names (best_model, best_pr_auc, best_pr_auc_sd, threshold), so each rule's numbers
+    sit under its own key; a flat merge would overwrite the set rule's with the model rule's."""
+    out = {"primary_set": ps["primary_set"], "primary_model": pm["primary_model"]}
+    if d_base is not None:
+        out["d_base"] = d_base
+    return {**out, "set_rule": dict(ps), "model_rule": {"feature_set": ps["primary_set"], **pm}}
+
+
 def base_for_d(summary: pd.DataFrame, models: list[str]) -> str:
     m = _main(summary, models)
     means = m[m.feature_set.isin(["B", "C"])].groupby("feature_set").pr_auc_mean.mean()
