@@ -59,3 +59,24 @@ tests/        synthetic-data tests (no downloads needed)
 - SDs across repeated CV folds are not independent: training sets overlap, so they understate
   the uncertainty. Reported SDs describe spread, not standard errors. Model and set differences
   are compared on identical folds with the Nadeau-Bengio corrected 95 % interval instead.
+
+## Limitations (draft)
+
+- **Survey design not modelled.** Models are trained and scored unweighted on the NHANES
+  sample. Survey weights (WTMEC2YR) enter only prevalence and a weighted sensitivity analysis of
+  ROC-AUC and PR-AUC; the strata and PSUs (SDMVSTRA, SDMVPSU) are not used at all.
+- **Intervals are too narrow.** Bootstrap intervals resample persons independently, ignoring
+  strata and PSUs, so they understate the uncertainty. SDs across repeated CV folds are not
+  independent either (see above).
+- **Sample vs population prevalence.** In the 2011-2016 development data the main label has a
+  prevalence of 3.1 % unweighted but 2.1 % weighted. Unweighted PR-AUC, PPV and net benefit
+  describe the NHANES sample, not the US adult population; read weighted PR-AUC against 2.1 %.
+- **Calibration differs by race/ethnicity.** Out-of-fold O/E for the primary model (logistic
+  regression, set A): 0.59 (95 % CI 0.48-0.70) in non-Hispanic White adults (risk overpredicted),
+  1.66 (1.31-2.08) in non-Hispanic Asian adults and 1.37 (1.06-1.68) in Mexican American adults
+  (underpredicted). Discrimination is similar across groups; a single risk threshold would not
+  mean the same thing in each.
+- **Label based on HbA1c only.** The main label is HbA1c ≥ 6.5 % from a single measurement, with
+  no confirmatory test. HbA1c misses some cases that fasting glucose or an OGTT would find, and
+  differs by race/ethnicity and with anaemia or haemoglobin variants. HbA1c-or-FPG on the
+  fasting subsample is a sensitivity analysis only.
