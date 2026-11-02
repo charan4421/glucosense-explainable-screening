@@ -10,13 +10,13 @@ from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_s
 METRICS = {"pr_auc": average_precision_score, "roc_auc": roc_auc_score, "brier": brier_score_loss}
 
 
-def summarize(y_true, p) -> dict:
+def summarize(y_true, p, sample_weight=None) -> dict:
     y_true = np.asarray(y_true)
     return {
-        "pr_auc": average_precision_score(y_true, p),
-        "roc_auc": roc_auc_score(y_true, p),
-        "brier": brier_score_loss(y_true, p),
-        "prevalence": float(y_true.mean()),
+        "pr_auc": average_precision_score(y_true, p, sample_weight=sample_weight),
+        "roc_auc": roc_auc_score(y_true, p, sample_weight=sample_weight),
+        "brier": brier_score_loss(y_true, p, sample_weight=sample_weight),
+        "prevalence": float(np.average(y_true, weights=sample_weight)),
     }
 
 
@@ -50,9 +50,14 @@ def calibration_stats(y_true, p) -> dict:
             "intercept_offset": float(a)}
 
 
-def bootstrap_ci(y_true, p, n_boot: int = 1000, seed: int = 42, alpha: float = 0.05) -> dict:
-    """Percentile bootstrap CIs (resampling test rows with replacement) for PR-AUC, ROC-AUC, Brier."""
+def bootstrap_ci(y_true, p, n_boot: int = 1000, seed: int = 42, alpha: float = 0.05,
+                 sample_weight=None) -> dict:
+    """Percentile bootstrap CIs (resampling test rows with replacement) for PR-AUC, ROC-AUC, Brier.
+
+    With sample_weight, each resampled row keeps its weight and the metrics are weighted. Rows
+    are resampled independently, so survey strata and PSUs are ignored."""
     y, p = np.asarray(y_true), np.asarray(p)
+    w = None if sample_weight is None else np.asarray(sample_weight, dtype=float)
     rng = np.random.default_rng(seed)
     stats = {k: [] for k in METRICS}
     n_skipped = 0
@@ -62,7 +67,7 @@ def bootstrap_ci(y_true, p, n_boot: int = 1000, seed: int = 42, alpha: float = 0
             n_skipped += 1
             continue
         for k, f in METRICS.items():
-            stats[k].append(f(y[idx], p[idx]))
+            stats[k].append(f(y[idx], p[idx], sample_weight=None if w is None else w[idx]))
     out = {"n_boot": n_boot, "n_skipped": n_skipped}
     for k, v in stats.items():
         lo, hi = np.percentile(v, [100 * alpha / 2, 100 * (1 - alpha / 2)])
@@ -115,6 +120,33 @@ def net_benefit(y_true, p, thresholds: np.ndarray) -> np.ndarray:
         fp = np.sum(pred & (y_true == 0))
         out.append(tp / n - fp / n * (t / (1 - t)))
     return np.array(out)
+
+
+def treat_all_net_benefit(y_true, thresholds: np.ndarray) -> np.ndarray:
+    prev = float(np.mean(y_true))
+    return prev - (1 - prev) * thresholds / (1 - thresholds)
+
+
+def bootstrap_net_benefit(y_true, preds: dict[str, np.ndarray], thresholds: np.ndarray,
+                          n_boot: int = 1000, seed: int = 42, alpha: float = 0.05) -> dict:
+    """Percentile bands for net benefit per threshold. Every model and treat-all are scored on the
+    same resamples, so `<model> - treat_all` bands are paired.
+
+    Returns {name: (low, high)} for each model, "treat_all" and "<model>_minus_treat_all"."""
+    y = np.asarray(y_true)
+    preds = {k: np.asarray(v) for k, v in preds.items()}
+    rng = np.random.default_rng(seed)
+    draws = {k: [] for k in [*preds, "treat_all", *(f"{m}_minus_treat_all" for m in preds)]}
+    for _ in range(n_boot):
+        idx = rng.integers(0, len(y), len(y))
+        ta = treat_all_net_benefit(y[idx], thresholds)
+        draws["treat_all"].append(ta)
+        for m, p in preds.items():
+            nb = net_benefit(y[idx], p[idx], thresholds)
+            draws[m].append(nb)
+            draws[f"{m}_minus_treat_all"].append(nb - ta)
+    q = [100 * alpha / 2, 100 * (1 - alpha / 2)]
+    return {k: tuple(np.percentile(np.array(v), q, axis=0)) for k, v in draws.items()}
 
 
 def decision_curve(y_true, p, thresholds=None) -> dict:

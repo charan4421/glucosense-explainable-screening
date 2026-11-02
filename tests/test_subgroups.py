@@ -24,3 +24,16 @@ def test_group_with_one_class_has_no_metrics():
     p = np.array([0.1, 0.2, 0.1, 0.8, 0.3, 0.7])
     t = subgroup_table(y, p, {"g": pd.Series(list("aaabbb"))}, min_pos=1).set_index("group")
     assert pd.isna(t.loc["a", "pr_auc"]) and not pd.isna(t.loc["b", "pr_auc"])
+
+
+def test_bootstrap_intervals_per_group():
+    rng = np.random.default_rng(0)
+    n = 3000
+    g = pd.Series(np.where(np.arange(n) % 2 == 0, "a", "b"))
+    y = (rng.random(n) < 0.06).astype(int)
+    p = np.clip(0.04 + 0.15 * y + rng.normal(0, 0.03, n), 0.001, 0.999)
+    t = subgroup_table(y, p, {"g": g}, min_pos=30, n_boot=100).set_index("group")
+    for k in ["pr_auc", "roc_auc", "calibration_slope", "observed_expected"]:
+        assert (t[f"{k}_ci_low"] <= t[k]).all() and (t[k] <= t[f"{k}_ci_high"]).all()
+    assert (t.n_boot_used == 100).all()
+    assert "pr_auc_ci_low" not in subgroup_table(y, p, {"g": g}).columns   # off by default
