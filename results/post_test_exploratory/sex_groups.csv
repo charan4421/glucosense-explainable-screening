@@ -1,0 +1,3 @@
+sex,n,n_pos,prevalence,mean_predicted,roc_auc,roc_auc_ci_low,roc_auc_ci_high,pr_auc,pr_auc_ci_low,pr_auc_ci_high,slope,slope_ci_low,slope_ci_high,intercept,intercept_ci_low,intercept_ci_high,intercept_offset,intercept_offset_ci_low,intercept_offset_ci_high,oe,oe_ci_low,oe_ci_high,label
+female,2152,90,0.04182,0.03681,0.81900,0.78280,0.85635,0.15118,0.10965,0.22175,1.04387,0.87442,1.25849,0.26164,-0.31142,0.88383,0.14267,-0.11147,0.35835,1.13620,0.90486,1.37081,"post-test, exploratory, not used for any decision"
+male,1943,67,0.03448,0.04174,0.73003,0.67445,0.78218,0.07461,0.05356,0.10825,0.70177,0.52307,0.91889,-1.02910,-1.65011,-0.38138,-0.21099,-0.48098,0.02673,0.82615,0.64493,1.02446,"post-test, exploratory, not used for any decision"

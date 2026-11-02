@@ -1,0 +1,7 @@
+metric,female,male,female_minus_male,ci_low,ci_high,n_boot,label
+roc_auc,0.81900,0.73003,0.08896,0.02235,0.15438,1000,"post-test, exploratory, not used for any decision"
+pr_auc,0.15118,0.07461,0.07657,0.02448,0.14950,1000,"post-test, exploratory, not used for any decision"
+slope,1.04387,0.70177,0.34210,0.06207,0.62720,1000,"post-test, exploratory, not used for any decision"
+intercept,0.26164,-1.02910,1.29074,0.45893,2.15558,1000,"post-test, exploratory, not used for any decision"
+intercept_offset,0.14267,-0.21099,0.35366,0.02891,0.72184,1000,"post-test, exploratory, not used for any decision"
+oe,1.13620,0.82615,0.31005,0.02558,0.62028,1000,"post-test, exploratory, not used for any decision"

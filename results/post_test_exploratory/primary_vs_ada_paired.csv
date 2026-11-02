@@ -1,0 +1,5 @@
+comparison,weighting,metric,primary,ada_style,difference,ci_low,ci_high,n_boot,label
+primary - ADA-style,unweighted,roc_auc,0.78037,0.71713,0.06325,0.03999,0.08648,1000,"post-test, exploratory, not used for any decision"
+primary - ADA-style,unweighted,pr_auc,0.10654,0.07148,0.03506,0.02246,0.05695,1000,"post-test, exploratory, not used for any decision"
+primary - ADA-style,WTMEC2YR,roc_auc,0.79867,0.72708,0.07159,0.03604,0.10928,1000,"post-test, exploratory, not used for any decision"
+primary - ADA-style,WTMEC2YR,pr_auc,0.08163,0.04788,0.03375,0.01892,0.06060,1000,"post-test, exploratory, not used for any decision"
