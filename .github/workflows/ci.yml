@@ -20,3 +20,5 @@ jobs:
         run: pip install -r requirements.txt
       - name: Test (synthetic data, no downloads)
         run: pytest -q
+      - name: Demo (scores the sample patient with the committed portable model)
+        run: python scripts/demo.py

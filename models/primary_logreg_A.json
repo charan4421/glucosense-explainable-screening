@@ -1,0 +1,133 @@
+{
+ "name": "GlucoSense primary model: L2 logistic regression, set A, one-hot",
+ "trained_on": "NHANES 2011-2016 (n = 13,189; 410 positives)",
+ "outcome": "undiagnosed diabetes, HbA1c >= 6.5 % (main label)",
+ "source_model_sha256": "954a99a63c0c4fe3f34bf4ff758e608f77577ba3fe517ba1e7d78e0443277199",
+ "settings_hash": "7e8d3481c8be1f28",
+ "pre_test_commit": "67950669ac18963a9f1908fcd6cc28ac009d4991",
+ "C": 0.3,
+ "check": {
+  "rows": 12240,
+  "max_abs_difference": 1.1102230246251565e-16
+ },
+ "intended_use": "research and teaching only; not a medical device",
+ "numeric": [
+  "age",
+  "bmi",
+  "waist_cm",
+  "systolic_bp",
+  "diastolic_bp",
+  "height_cm",
+  "age_x_bmi",
+  "bmi_per_age",
+  "waist_height_ratio",
+  "pulse_pressure"
+ ],
+ "categorical": [
+  "sex",
+  "family_history_diabetes",
+  "smoker",
+  "race_eth"
+ ],
+ "center": [
+  46.0,
+  27.6,
+  96.5,
+  120.0,
+  70.66666666666667,
+  166.8,
+  1301.8999999999999,
+  0.6236842105263157,
+  0.5779183438757907,
+  48.66666666666667
+ ],
+ "scale": [
+  28.0,
+  8.100000000000001,
+  20.599999999999994,
+  20.66666666666667,
+  13.333333333333343,
+  14.5,
+  851.0,
+  0.41555023923444984,
+  0.12214694760662459,
+  19.33333333333333
+ ],
+ "categorical_fill": [
+  "female",
+  "no",
+  "no",
+  "3"
+ ],
+ "levels": [
+  [
+   "female",
+   "male"
+  ],
+  [
+   "no",
+   "yes"
+  ],
+  [
+   "no",
+   "yes"
+  ],
+  [
+   "1",
+   "2",
+   "3",
+   "4",
+   "6",
+   "7"
+  ]
+ ],
+ "dropped": [
+  0,
+  0,
+  0,
+  null
+ ],
+ "features_out": [
+  "age",
+  "bmi",
+  "waist_cm",
+  "systolic_bp",
+  "diastolic_bp",
+  "height_cm",
+  "age_x_bmi",
+  "bmi_per_age",
+  "waist_height_ratio",
+  "pulse_pressure",
+  "sex_male",
+  "family_history_diabetes_yes",
+  "smoker_yes",
+  "race_eth_1",
+  "race_eth_2",
+  "race_eth_3",
+  "race_eth_4",
+  "race_eth_6",
+  "race_eth_7"
+ ],
+ "coef": [
+  0.6036816640681129,
+  0.5365750798332132,
+  0.9121980200503229,
+  0.1621731110841976,
+  0.08469741167135024,
+  -0.2778501446644369,
+  -0.5726082524888263,
+  -0.8902669468284814,
+  0.11165558941548129,
+  0.09993178311771113,
+  0.40686648335250525,
+  0.608149325584295,
+  0.0006683345794246049,
+  0.0313458524878854,
+  0.01655881608499877,
+  -0.8202064335599224,
+  0.008699383245208652,
+  0.6509305489830108,
+  -0.32272466701078845
+ ],
+ "intercept": -4.27270789284125
+}

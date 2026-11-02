@@ -1,0 +1,13 @@
+{
+ "_note": "Fictional patient for the demo; not an NHANES participant.",
+ "age": 58,
+ "sex": "male",
+ "bmi": 32.5,
+ "waist_cm": 110,
+ "height_cm": 175,
+ "systolic_bp": 138,
+ "diastolic_bp": 84,
+ "family_history_diabetes": "yes",
+ "smoker": "no",
+ "race_eth": "3"
+}
