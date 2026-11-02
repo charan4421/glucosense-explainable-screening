@@ -32,7 +32,11 @@ python scripts/run_dev.py
 python scripts/run_experiment.py --config configs/config.yaml --n-iter 5
 python scripts/run_experiment.py --models logreg,ada_style --strategies none --n-iter 5   # baselines
 python scripts/summarize_dev_cv.py                   # rebuild results/dev_cv_summary.csv any time
-# temporal test: tune on 2011-2016, score once on 2017-2018 (reports/temporal_test.csv)
+# the single 2017-2018 temporal test (docs/analysis_plan.md section 9; already run, do not rerun)
+python -m src.data.nhanes --test                     # builds 2017-2018 alone, same rules
+python scripts/run_test.py --stage fit               # 2011-2016 only: refit, hashes, run log
+python scripts/run_test.py --stage score             # refuses unless tree clean, tag pre-test, hashes match
+# v1 (before the plan) temporal run of XGBoost, kept as a record (results/temporal_test.csv)
 python scripts/run_experiment.py --mode temporal --models xgboost --strategies none
 ```
 
@@ -50,6 +54,81 @@ src/explain/  SHAP, LIME, DiCE
 src/app/      FastAPI service + Streamlit dashboard
 tests/        synthetic-data tests (no downloads needed)
 ```
+
+## Results: development (2011-2016) and the single 2017-2018 temporal test
+
+Pre-specified in `docs/analysis_plan.md` (section 9 and the deviations). The test was scored
+**once** from the commit tagged `pre-test` (`6795066`); its results are in
+`results/test_2017_2018/` (commit `befb8b1`), with every hash in `run_log.json`. The primary
+model is L2 logistic regression on set A (10 inputs, one-hot categoricals), refit on all of
+2011-2016 (C = 0.3) and **not recalibrated**.
+
+**Primary model, unweighted (primary result).** Test values have bootstrap 95 % intervals (1000
+resamples, seed 42). Development values are means over the 15 nested-CV folds; LOCO is the
+2015-2016 held-out cycle, the closest development analogue.
+
+| Metric | Dev nested CV | Dev LOCO 2015-16 | **Test 2017-18** |
+|---|---|---|---|
+| n (positives), prevalence | 13,189 (410), 3.1 % | 4,294 (127), 3.0 % | **4,095 (157), 3.8 %** |
+| PR-AUC | 0.104 | 0.079 | **0.107 (0.085-0.139)** |
+| PR-AUC / prevalence | 3.3 | 2.7 | **2.8** |
+| ROC-AUC | 0.805 | 0.773 | **0.780 (0.749-0.811)** |
+| Brier | 0.029 | 0.029 | **0.036 (0.031-0.041)** |
+| Calibration slope | 1.00 | 0.83 | **0.89 (0.76-1.02)** |
+| Calibration intercept | 0.01 | −0.73 | **−0.33 (−0.74 to 0.05)** |
+| O/E | 1.00 | 0.79 | **0.98 (0.84-1.13)** |
+
+Discrimination dropped from development (ROC-AUC 0.805 → 0.780), to about the level the
+2015-2016 LOCO predicted, as section 9 expected. Calibration-in-the-large held (O/E 0.98). The
+slope of 0.89 points to slightly too-extreme risks, but its interval includes 1. PR-AUC is higher
+than in development only because prevalence is higher; relative to prevalence it fell (3.3 → 2.8).
+
+**Secondary results (labelled; none replaces the primary result).**
+
+| Model / version | Dev PR-AUC / ROC-AUC | Test PR-AUC | Test ROC-AUC | Test O/E |
+|---|---|---|---|---|
+| Primary, survey-weighted (WTMEC2YR) | 0.088 / 0.844 (prev 2.1 %) | 0.082 (0.063-0.114), prev 2.5 % | 0.799 (0.751-0.846) | — |
+| Primary, intercept-recalibrated on the test | — | 0.107 (unchanged) | 0.780 (unchanged) | 1.00 by construction |
+| EBM / set B | 0.112 / 0.800 | 0.114 (0.090-0.151) | 0.781 (0.747-0.812) | 1.10 (0.94-1.27) |
+| ADA-style score (comparator) | 0.079 / 0.749 | 0.072 (0.058-0.087) | 0.717 (0.680-0.752) | 1.03 (0.87-1.19) |
+
+- **Recalibration:** the recalibration intercept was −0.02. It changed Brier only in the fourth
+  decimal (0.0360 → 0.0359) and net benefit by less than 0.001, so a local intercept update is not
+  needed.
+- **EBM / B:** it adds 30 questionnaire inputs, but on the test it is no better than the primary
+  model. Its alcohol items were left missing and imputed, because the 2017 questionnaire changed.
+- **ADA-style score:** both models beat it on every discrimination metric.
+
+**Decision curve (1-5 %, `test_dca.csv/.png`).** The primary model's net benefit is above
+treat-all at every threshold from 1 % to 5 %, and the paired bootstrap band of the difference
+excludes 0 throughout.
+
+| Threshold | Net benefit − treat-all, test (95 % band) | Dev (out-of-fold) |
+|---|---|---|
+| 1 % | 0.0027 (0.0026-0.0029) | 0.0026 |
+| 2 % | 0.0050 (0.0029-0.0070) | 0.0080 |
+| 3 % | 0.0107 (0.0080-0.0134) | 0.0141 |
+| 5 % | 0.0249 (0.0212-0.0287) | 0.0286 |
+
+**Subgroups, primary model (`test_subgroups_logreg__none__A.csv`).**
+
+| Group (positives) | PR-AUC | ROC-AUC | Slope | O/E |
+|---|---|---|---|---|
+| Women (90) | 0.151 (0.112-0.218) | 0.819 (0.782-0.853) | 1.04 | 1.14 (0.91-1.37) |
+| Men (67) | 0.075 (0.054-0.107) | 0.730 (0.675-0.789) | 0.70 (0.53-0.93) | 0.83 (0.64-1.00) |
+| Non-Hispanic Black (54) | 0.137 | 0.743 (0.678-0.806) | 0.73 | 1.07 (0.81-1.33) |
+| Other groups (8-28 each) | flagged unreliable (< 30 positives) | | | |
+
+**Post-test findings** (seen only after scoring; reported, nothing was rerun or changed):
+1. **Men vs women.** Discrimination and calibration slope are clearly worse in men on the test
+   (ROC-AUC 0.73 vs 0.82, slope 0.70). In development the two sexes were alike (ROC-AUC 0.805
+   vs 0.803, slopes 1.04 and 0.97). This was not expected, and it rests on 67 male positives.
+2. **Race/ethnicity cannot be checked on the test.** Only non-Hispanic Black adults reach 30
+   positives. So the development fix for calibration by race/ethnicity is not confirmed or
+   refuted on 2017-2018.
+3. **The recalibrated O/E interval is degenerate (1.00-1.00).** The intercept is re-estimated in
+   every resample, which forces O/E to 1. This is a property of the method, not a result.
+4. **PR-AUC is not comparable across prevalences.** Read it against prevalence; the ratio fell.
 
 ## Notes on honesty
 
@@ -94,6 +173,15 @@ tests/        synthetic-data tests (no downloads needed)
   miscalibration is gone, not that calibration is equal across groups. Group-wise
   recalibration was dropped as no longer needed. The MLP also received ordinal codes and was
   not refit; it is never the primary model.
+- **2017-2018 was not untouched.** Before the analysis plan, the v1 pipeline scored XGBoost on
+  2017-2018 once (commit `df1b305`: PR-AUC 0.101, ROC-AUC 0.776, prevalence 3.8 %, v1 rules). No
+  selection rule used it, but the cycle's prevalence and one model's performance were known.
+- **Test item mapping.** The 2017 alcohol questionnaire was redesigned, so the three alcohol
+  items are missing on the test and were imputed (this affects EBM / B only). Other 2017-2018
+  items keep their 2011-2016 names, and their codes were assumed unchanged without re-checking
+  every codebook.
+- **One test cycle, small subgroups.** 157 test positives; only one race/ethnicity group
+  reaches 30, and the men-vs-women difference rests on 67 male positives.
 - **Label based on HbA1c only.** The main label is HbA1c ≥ 6.5 % from a single measurement, with
   no confirmatory test. HbA1c misses some cases that fasting glucose or an OGTT would find, and
   differs by race/ethnicity and with anaemia or haemoglobin variants. HbA1c-or-FPG on the
