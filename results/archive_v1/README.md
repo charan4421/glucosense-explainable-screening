@@ -1,0 +1,1 @@
+These files predate the v2 build (data/processed/nhanes_dev.parquet, docs/analysis_plan.md): they come from the v1 data and v1 out-of-fold predictions, are superseded by results/dev_cv_v2_dca.* and results/dev_cv_v2_subgroups_*.csv, and must not be cited.
