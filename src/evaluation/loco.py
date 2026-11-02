@@ -16,7 +16,8 @@ from src.preprocessing.pipeline import build_model_pipeline
 
 
 def loco(df: pd.DataFrame, feats: list[str], categorical: list[str], target: str,
-         model_name: str, strategy: str, cfg: dict, n_iter: int) -> pd.DataFrame:
+         model_name: str, strategy: str, cfg: dict, n_iter: int, on_fold=None) -> pd.DataFrame:
+    """on_fold(held_out_cycle, search, train, test), if given, is called after each fit."""
     seed, cv = cfg["seed"], cfg["cv"]
     rows = []
     for held_out in sorted(df.cycle.unique()):
@@ -34,6 +35,8 @@ def loco(df: pd.DataFrame, feats: list[str], categorical: list[str], target: str
                 cv=StratifiedKFold(cv["inner_folds"], shuffle=True, random_state=seed), refit=True)
             search.fit(train[feats], train[target])
             best = search.best_params_
+        if on_fold:
+            on_fold(held_out, search, train, test)
         y, p = test[target].to_numpy(), search.predict_proba(test[feats])[:, 1]
         cal = calibration_stats(y, p)
         rows.append({"model": model_name, "strategy": strategy, "held_out_cycle": held_out,

@@ -18,12 +18,19 @@ from src.preprocessing.pipeline import build_model_pipeline
 def nested_cv(X: pd.DataFrame, y, model_name: str, strategy: str, categorical: list[str],
               outer_folds: int = 5, inner_folds: int = 3, n_iter: int = 15,
               scoring: str = "average_precision", knn_neighbors: int = 5,
-              interactions: bool = True, seed: int = 42, outer_repeats: int = 1):
+              interactions: bool = True, seed: int = 42, outer_repeats: int = 1,
+              make_pipeline=None, postprocess=None, on_fold=None):
     """Returns (per-fold metrics DataFrame, out-of-fold probabilities).
 
     With outer_repeats > 1 the outer split is repeated with new shuffles and the out-of-fold
     probabilities are averaged over repeats. Folds depend only on (y, seed), so every model and
-    feature set sees the same folds."""
+    feature set sees the same folds.
+
+    Optional hooks (all default to the standard analysis):
+    - make_pipeline(X_train, model) -> pipeline, replacing build_model_pipeline;
+    - postprocess(search, X_train, y_train, X_test, p, inner_cv) -> p, applied to the outer test
+      predictions before scoring (fitted on training data only);
+    - on_fold(i, search, train_idx, test_idx), called after each outer fold, e.g. to keep models."""
     y = np.asarray(y)
     if outer_repeats > 1:
         outer = RepeatedStratifiedKFold(n_splits=outer_folds, n_repeats=outer_repeats,
@@ -47,13 +54,18 @@ def nested_cv(X: pd.DataFrame, y, model_name: str, strategy: str, categorical: l
             search = model.fit(X.iloc[tr], y[tr])
             best_params = {}
         else:
-            pipe = build_model_pipeline(X.iloc[tr], model, categorical, strategy_here,
-                                        knn_neighbors, interactions, seed)
+            pipe = (make_pipeline(X.iloc[tr], model) if make_pipeline else
+                    build_model_pipeline(X.iloc[tr], model, categorical, strategy_here,
+                                         knn_neighbors, interactions, seed))
             search = RandomizedSearchCV(pipe, space, n_iter=n_iter, cv=inner, scoring=scoring,
                                         random_state=seed, n_jobs=1, refit=True)
             search.fit(X.iloc[tr], y[tr])
             best_params = search.best_params_
         p = search.predict_proba(X.iloc[te])[:, 1]
+        if postprocess:
+            p = postprocess(search, X.iloc[tr], y[tr], X.iloc[te], p, inner)
+        if on_fold:
+            on_fold(i, search, tr, te)
         oof_sum[te] += p
         oof_n[te] += 1
         cal = calibration_stats(y[te], p)          # on this outer fold's predictions only
