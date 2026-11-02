@@ -1,0 +1,53 @@
+development cycles ['2011-2012', '2013-2014', '2015-2016'], n=13189, positives=410; 2017-2018 not loaded
+[main] logreg / none / set A (10 features): running
+[main] logreg / none / set A (10 features): done in 131s (total elapsed 131s)  PR-AUC 0.1041
+[main] logreg / none / set B (40 features): running
+[main] logreg / none / set B (40 features): done in 735s (total elapsed 865s)  PR-AUC 0.1064
+[main] logreg / none / set C (43 features): running
+[main] logreg / none / set C (43 features): done in 813s (total elapsed 1678s)  PR-AUC 0.1092
+[main] xgboost / none / set A (10 features): checkpoint matches, skipped
+[main] xgboost / none / set B (40 features): checkpoint matches, skipped
+[main] xgboost / none / set C (43 features): checkpoint matches, skipped
+[main] mlp / none / set A (10 features): checkpoint matches, skipped
+[main] mlp / none / set B (40 features): checkpoint matches, skipped
+[main] mlp / none / set C (43 features): checkpoint matches, skipped
+[main] ebm / none / set A (10 features): checkpoint matches, skipped
+[main] ebm / none / set B (40 features): checkpoint matches, skipped
+[main] ebm / none / set C (43 features): checkpoint matches, skipped
+[main] logreg / none / set D (47 features): running
+[main] logreg / none / set D (47 features): done in 833s (total elapsed 2511s)  PR-AUC 0.1098
+[main] xgboost / none / set D (47 features): checkpoint matches, skipped
+[main] mlp / none / set D (47 features): checkpoint matches, skipped
+[main] ebm / none / set D (47 features): checkpoint matches, skipped
+[loco] logreg / none / set A (10 features): running
+[loco] logreg / none / set A (10 features): done in 19s (total elapsed 2530s)  PR-AUC 0.1022
+[loco] xgboost / none / set A (10 features): checkpoint matches, skipped
+[loco] mlp / none / set A (10 features): checkpoint matches, skipped
+[loco] ebm / none / set A (10 features): checkpoint matches, skipped
+[main] xgboost / class_weight / set A (10 features): checkpoint matches, skipped
+[main] xgboost / smotenc / set A (10 features): checkpoint matches, skipped
+[main] mlp / class_weight / set A (10 features): checkpoint matches, skipped
+[main] mlp / smotenc / set A (10 features): checkpoint matches, skipped
+[main] tabnet / none / set A (10 features): checkpoint matches, skipped
+[main] tabnet / smotenc / set A (10 features): checkpoint matches, skipped
+{
+  "primary_set": "A",
+  "primary_model": "logreg",
+  "d_base": "C",
+  "set_rule": {
+    "primary_set": "A",
+    "best_set": "C",
+    "best_model": "ebm",
+    "best_pr_auc": 0.112849108661718,
+    "best_pr_auc_sd": 0.018180956499423598,
+    "threshold": 0.0946681521622944
+  },
+  "model_rule": {
+    "feature_set": "A",
+    "primary_model": "logreg",
+    "best_model": "logreg",
+    "best_pr_auc": 0.10405985239491232,
+    "best_pr_auc_sd": 0.01421749578239293,
+    "threshold": 0.0898423566125194
+  }
+}

@@ -13,9 +13,9 @@
   "model_rule": {
     "feature_set": "A",
     "primary_model": "logreg",
-    "best_model": "ebm",
-    "best_pr_auc": 0.09638014999820206,
-    "best_pr_auc_sd": 0.011622213025412218,
-    "threshold": 0.08475793697278984
+    "best_model": "logreg",
+    "best_pr_auc": 0.10405985239491232,
+    "best_pr_auc_sd": 0.01421749578239293,
+    "threshold": 0.0898423566125194
   }
 }
