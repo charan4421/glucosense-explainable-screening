@@ -15,6 +15,8 @@ Lab values and weights build labels and estimates only. They are never used as f
 
 `python -m src.data.nhanes --download` builds the DEVELOPMENT cycles only (data.dev_cycles) into
 data.dev_processed_path; the temporal test cycle is never read by this build.
+`python -m src.data.nhanes --test` builds the test cycle alone into data/processed/nhanes_test.parquet
+with the same rules (docs/analysis_plan.md, deviation "test protocol").
 """
 from __future__ import annotations
 
@@ -94,7 +96,14 @@ SENS_LABEL = "undiagnosed_diabetes_a1c_or_fpg"
 # CDC GLU_I analytic note: 2015-2016 glucose was measured on a Roche Cobas C311 that reads ~2 %
 # higher than the C501 used before. Backward equation to the C501 scale: C501 = a * C311 + b.
 # Applied to the SENSITIVITY label only; the main label (HbA1c) is unchanged.
-FPG_BACKWARD = {"2015-2016": (0.9776, 0.4994)}
+# GLU_J documentation: "The Cobas C311 analyzer was used in 2017-2018 and 2015-2016", so the same
+# backward equation applies (section 9 FPG rule).
+FPG_BACKWARD = {"2015-2016": (0.9776, 0.4994), "2017-2018": (0.9776, 0.4994)}
+
+# Raw items that cannot be reproduced with the 2011-2016 definition in a cycle: left missing (the
+# training-fitted imputers fill them). 2017-2018 redesigned the alcohol questionnaire (ALQ111/121/142).
+UNMAPPED = {"2017-2018": ["ALQ101", "ALQ110", "ALQ120Q", "ALQ120U", "ALQ141Q", "ALQ141U"]}
+TEST_PATH = "data/processed/nhanes_test.parquet"
 
 
 def label_frame(df: pd.DataFrame, exclude_pregnant: bool = True,
@@ -140,6 +149,10 @@ def build_cycle(raw_dir: str | Path, cycle: str, log: list | None = None) -> pd.
     df = demo
     for part in parts:
         df = df.merge(part, on="SEQN", how="left")
+    for col in UNMAPPED.get(cycle, []):
+        if col in df:
+            raise ValueError(f"{col} exists in {cycle}; revisit UNMAPPED")
+        df[col] = np.nan
 
     adj = FPG_BACKWARD.get(cycle)
     n_with_pregnant = len(label_frame(df, exclude_pregnant=False))
@@ -210,9 +223,21 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", default="configs/config.yaml")
     ap.add_argument("--download", action="store_true")
+    ap.add_argument("--test", action="store_true", help="build the temporal test cycle alone")
     args = ap.parse_args()
     cfg = yaml.safe_load(open(args.config))
     d = cfg["data"]
+    if args.test:
+        cycle = d["temporal_test_cycle"]
+        if args.download:
+            download(d["raw_dir"], [cycle])
+        log: list = []
+        df = build(d["raw_dir"], [cycle], log)
+        assert set(df.cycle) == {cycle}
+        df.to_parquet(TEST_PATH, index=False)
+        # sample counts only: labels are not summarised before scoring
+        print(f"{cycle}: n={len(df)}, pregnant excluded={log[0]['pregnant_excluded']} -> {TEST_PATH}")
+        raise SystemExit(0)
     cycles = d["dev_cycles"]
     assert d["temporal_test_cycle"] not in cycles, "the test cycle must not be built here"
     if args.download:

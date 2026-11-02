@@ -10,7 +10,7 @@ from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 
 from src.data.nhanes import MAIN_LABEL, SENS_LABEL
 from src.evaluation.metrics import summarize
-from src.models.models import categorical_encoding, get_model
+from src.models.models import RAW_INPUT_MODELS, categorical_encoding, get_model
 from src.preprocessing.pipeline import build_model_pipeline
 
 # Raw NHANES lab columns and every label derived from them.
@@ -59,15 +59,15 @@ def temporal_split(df: pd.DataFrame, test_cycle: str) -> tuple[pd.DataFrame, pd.
     return train, test
 
 
-def temporal_evaluate(df: pd.DataFrame, feats: list[str], categorical: list[str], target: str,
-                      test_cycle: str, model_name: str, strategy: str,
-                      cfg: dict) -> tuple[dict, pd.DataFrame]:
-    """Tune with inner CV on the training cycles only, then score once on the test cycle.
-
-    Returns (metrics row, test predictions with columns y_true and p)."""
-    train, test = temporal_split(df, test_cycle)
+def fit_final(train: pd.DataFrame, feats: list[str], categorical: list[str], target: str,
+              model_name: str, strategy: str, cfg: dict):
+    """The frozen tuning procedure on the training data only: inner stratified CV, randomised
+    search (cfg n_iter, PR-AUC), refit on all training rows. Fixed-score models (no search) are
+    fitted directly. Returns the fitted estimator (predict_proba on raw feature frames)."""
     seed, cv = cfg["seed"], cfg["cv"]
     model, space = get_model(model_name, seed)
+    if model_name in RAW_INPUT_MODELS:
+        return model.fit(train[feats], train[target])
     pipe = build_model_pipeline(train[feats], model, categorical, strategy,
                                 cfg["preprocessing"]["knn_neighbors"],
                                 cfg["features"]["interactions"], seed,
@@ -75,7 +75,17 @@ def temporal_evaluate(df: pd.DataFrame, feats: list[str], categorical: list[str]
     search = RandomizedSearchCV(pipe, space, n_iter=cv["n_iter"],
                                 cv=StratifiedKFold(cv["inner_folds"], shuffle=True, random_state=seed),
                                 scoring=cv["scoring"], random_state=seed, n_jobs=1, refit=True)
-    search.fit(train[feats], train[target])
+    return search.fit(train[feats], train[target])
+
+
+def temporal_evaluate(df: pd.DataFrame, feats: list[str], categorical: list[str], target: str,
+                      test_cycle: str, model_name: str, strategy: str,
+                      cfg: dict) -> tuple[dict, pd.DataFrame]:
+    """Tune with inner CV on the training cycles only, then score once on the test cycle.
+
+    Returns (metrics row, test predictions with columns y_true and p)."""
+    train, test = temporal_split(df, test_cycle)
+    search = fit_final(train, feats, categorical, target, model_name, strategy, cfg)
     p = search.predict_proba(test[feats])[:, 1]
     m = summarize(test[target], p)
     row = {"model": model_name, "strategy": strategy, "test_cycle": test_cycle,
@@ -83,6 +93,6 @@ def temporal_evaluate(df: pd.DataFrame, feats: list[str], categorical: list[str]
            "n_train": len(train), "n_test": len(test),
            "train_prevalence": float(np.mean(train[target])),
            "test_prevalence": m.pop("prevalence"), **m,
-           "best_params": str(search.best_params_)}
+           "best_params": str(getattr(search, "best_params_", {}))}
     preds = pd.DataFrame({"y_true": test[target].to_numpy(), "p": p}, index=test.index)
     return row, preds
