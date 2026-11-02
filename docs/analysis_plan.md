@@ -329,3 +329,93 @@ n_iter. A restart skips a combination only if the hash matches.
   - **Why:** the development analysis now reports weighted discrimination (deviation above) and
     the 2015-2016 held-out cycle showed overprediction, so both are fixed for the test before it
     is run. 2017-2018 has not been read.
+
+- **2026-11-02: A. calibration across race/ethnicity (exploratory extension).** Written before
+  any of it was run. Development data (2011-2016) only; 2017-2018 is not read.
+  - **Question:** does a simple fix reduce the race/ethnicity O/E gap of the primary model
+    (logistic regression, set A, out-of-fold: non-Hispanic White 0.59, non-Hispanic Asian 1.66,
+    Mexican American 1.37)?
+  - **Observation behind it:** in the current pipeline `race_eth` reaches the logistic regression
+    as one ordinal code (`OrdinalEncoder` maps NHANES codes 1, 2, 3, 4, 6, 7 to 0-5), so the model
+    fits a single slope over arbitrary group codes and cannot give each group its own baseline.
+    Tree models and EBM can split the code, so this concerns the logistic regression only.
+  - **Candidates (fixed now), all logistic regression on set A:**
+    1. **Interactions:** `race_eth` one-hot (reference: non-Hispanic White) as main effects, plus
+       `race_eth × BMI` and `race_eth × waist`. The interactions need the one-hot coding, and
+       their main effects come with them.
+    2. **Group-wise intercept recalibration** of the primary model, fitted on training folds
+       only. In each outer training fold the model is tuned as usual; inner cross-validated
+       predictions on that training fold (same 3 inner folds, tuned hyperparameters) give one
+       intercept offset per race/ethnicity group (logit p as offset, slope fixed at 1). Groups
+       with fewer than 30 positives in the training fold keep offset 0. The offsets are applied
+       to the outer test fold's predictions.
+    - **Descriptive only, not a candidate:** one-hot `race_eth` main effects without
+      interactions, to show how much of any change comes from the encoding alone.
+  - **Evaluation:** the same nested CV as the main grid (5-fold × 3 repeats, seed 42, inner
+    3-fold, n_iter = 5, identical folds). Per-fold PR-AUC, ROC-AUC, Brier and calibration; O/E by
+    group from the averaged out-of-fold predictions, with the same within-group bootstrap as the
+    subgroup tables (1000 resamples, seed 42).
+  - **Decision rule (fixed now):** a candidate is adopted only if **both** hold:
+    - its O/E 95 % CI includes 1 for more race/ethnicity groups than the primary model's. The
+      count runs over the five groups with ≥ 30 positives (Mexican American, other Hispanic,
+      non-Hispanic White, non-Hispanic Black, non-Hispanic Asian); other/multiracial (10
+      positives) is reported but not counted. The primary model's count is 2 of 5 (Black,
+      other Hispanic).
+    - its mean PR-AUC over the 15 folds is ≥ the primary model's mean − one SD
+      (0.0938 − 0.0153 = 0.0785).
+
+    If both candidates qualify, the one covering more groups is adopted, then the higher PR-AUC.
+    Otherwise the result is reported as a negative result.
+  - **Either way:** the primary model stays logistic regression on set A as selected. An adopted
+    candidate is reported as an exploratory extension and is **not** applied in the 2017-2018
+    test (section 9) unless a further deviation, written before that cycle is opened, says so.
+    Using race/ethnicity to adjust predicted risk is contested; that is discussed with the result.
+  - **Output:** `results/dev_cv_v2_calib_ext/` (per-fold results and out-of-fold predictions per
+    candidate), `results/dev_cv_v2_calib_ext_summary.csv`, `_subgroups.csv`, `_decision.json`.
+
+- **2026-11-02: B. explanation analysis (exploratory).** Written before any of it was run.
+  Development data only. Models: logistic regression / A (primary) and EBM / B (secondary).
+  - **Fitted models:** the 15 outer-fold models and the 3 leave-one-cycle-out models are refit
+    with exactly the nested-CV and LOCO procedure (same folds, seeds and tuning). Each refit is
+    checked against the committed per-fold PR-AUC; any mismatch is reported.
+  - **Feature space:** explanations are of the whole pipeline on the raw input features (10 for
+    A, 40 for B), not the internal interaction terms. Missing inputs are filled with the fold's
+    own fitted imputation, so every explained value is an imputed input value. Categorical
+    inputs are integer-coded for the explainers and decoded before prediction.
+  - **SHAP vs LIME agreement:**
+    - **Patients:** 204 = 17 per race/ethnicity × sex cell (12 cells), sampled at random within
+      each cell (seed 42). Each patient is explained by the repeat-0 outer-fold model for which
+      they were in the test fold (held-out explanations).
+    - **SHAP:** permutation explainer, independent masker with 100 background rows from that
+      model's training fold (seed 42), default evaluation budget.
+    - **LIME:** `LimeTabularExplainer` defaults (quartile discretisation, 5000 samples), the same
+      training fold as reference data, all features, `random_state` 42.
+    - **Agreement per patient:** top-5 overlap (shared features among the top 5 by |attribution|,
+      divided by 5) and Spearman correlation of |SHAP| with |LIME weight| across all features.
+    - **Summary:** mean with percentile bootstrap 95 % CI over patients (1000 resamples), overall,
+      by race/ethnicity and by sex.
+  - **Stability of global SHAP importance** (mean |SHAP| over the same 204 patients for every
+    model, so differences come from the models; some patients are in a model's training data):
+    - across the 15 outer-fold models: the 105 pairwise Spearman correlations (mean, min, max);
+    - across the 3 LOCO models: the 3 pairwise correlations;
+    - bootstrap 95 % CI for the mean pairwise correlation, resampling the 204 patients
+      (1000 resamples), and each feature's rank range across models.
+  - **DiCE counterfactuals:**
+    - **Patients:** 20 sampled at random (seed 42) from patients predicted ≥ 3 % by both models'
+      repeat-0 held-out predictions. 3 % is the middle of the pre-specified 1-5 % window and is
+      close to the prevalence. Each is explained by the same held-out fold model as above.
+    - **Target:** predicted risk < 3 % (DiCE's default 0.5 cut is meaningless at 3 % prevalence).
+      DiCE `random` method, 3 counterfactuals per patient, seed 42.
+    - **Immutable:** age, sex, height_cm, race_eth, family_history_diabetes, smoker. Everything
+      else in the set may vary within the training range.
+    - **Metrics:**
+      - validity: share of counterfactuals rescored < 3 % by the model;
+      - proximity: mean over changed numeric features of |change| / training MAD;
+      - sparsity: number of features changed;
+      - plausibility: share with every changed value inside the training 1st-99th percentile
+        **and** no change to a history item that no action can change (gdm_history, baby_9lb,
+        htn_told, sleep_trouble_told, weight_change_1y_kg, weight_change_10y_kg and its `_na`
+        flag, weight_gain_since_25_kg and its `_na` flag, and smoking_status moving to "never").
+    - **Framing:** the counterfactuals explain the model. They are not clinical advice or causal
+      claims, and every output file says so.
+  - **Output:** `results/dev_cv_v2_explain/`.
