@@ -1,0 +1,32 @@
+ebm__none__B: refit 2799s; max |PR-AUC diff| vs committed 0.00e+00; max |OOF diff| 0.00e+00
+  ebm__none__B fold0: SHAP + LIME 366s
+  ebm__none__B fold1: SHAP + LIME 346s
+  ebm__none__B fold2: SHAP + LIME 345s
+  ebm__none__B fold3: SHAP + LIME 347s
+  ebm__none__B fold4: SHAP + LIME 348s
+  ebm__none__B fold5: SHAP 328s
+  ebm__none__B fold6: SHAP 327s
+  ebm__none__B fold7: SHAP 329s
+  ebm__none__B fold8: SHAP 328s
+  ebm__none__B fold9: SHAP 329s
+  ebm__none__B fold10: SHAP 326s
+  ebm__none__B fold11: SHAP 330s
+  ebm__none__B fold12: SHAP 327s
+  ebm__none__B fold13: SHAP 328s
+  ebm__none__B fold14: SHAP 329s
+  ebm__none__B loco_2011-2012: SHAP 325s
+  ebm__none__B loco_2013-2014: SHAP 327s
+  ebm__none__B loco_2015-2016: SHAP 327s
+         run variable               group   n  top5_overlap  top5_overlap_ci_low  top5_overlap_ci_high  spearman  spearman_ci_low  spearman_ci_high  spearman_n_undefined
+ebm__none__B  overall                 all 204         0.493                0.474                 0.513     0.623            0.609             0.635                     0
+ebm__none__B race_eth    Mexican American  34         0.518                0.465                 0.571     0.627            0.593             0.658                     0
+ebm__none__B race_eth  Non-Hispanic Asian  34         0.494                0.447                 0.535     0.643            0.613             0.671                     0
+ebm__none__B race_eth  Non-Hispanic Black  34         0.494                0.453                 0.535     0.610            0.581             0.638                     0
+ebm__none__B race_eth  Non-Hispanic White  34         0.500                0.447                 0.559     0.625            0.592             0.657                     0
+ebm__none__B race_eth Other / multiracial  34         0.476                0.435                 0.518     0.626            0.599             0.653                     0
+ebm__none__B race_eth      Other Hispanic  34         0.476                0.429                 0.524     0.605            0.565             0.640                     0
+ebm__none__B      sex              female 102         0.506                0.478                 0.535     0.640            0.625             0.657                     0
+ebm__none__B      sex                male 102         0.480                0.457                 0.506     0.605            0.587             0.624                     0
+         run      models  n_models  n_pairs  spearman_mean  spearman_ci_low  spearman_ci_high  spearman_min  spearman_max
+ebm__none__B outer_folds        15      105          0.839            0.826             0.850         0.673         0.950
+ebm__none__B        loco         3        3          0.723            0.696             0.741         0.678         0.748

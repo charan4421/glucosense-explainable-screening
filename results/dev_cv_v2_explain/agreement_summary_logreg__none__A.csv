@@ -1,0 +1,10 @@
+run,variable,group,n,top5_overlap,top5_overlap_ci_low,top5_overlap_ci_high,spearman,spearman_ci_low,spearman_ci_high,spearman_n_undefined
+logreg__none__A,overall,all,204,0.8627,0.8451,0.8804,0.8613,0.8497,0.8730,0
+logreg__none__A,race_eth,Mexican American,34,0.8882,0.8529,0.9235,0.8891,0.8681,0.9095,0
+logreg__none__A,race_eth,Non-Hispanic Asian,34,0.8353,0.7941,0.8765,0.8781,0.8585,0.8970,0
+logreg__none__A,race_eth,Non-Hispanic Black,34,0.8294,0.7824,0.8765,0.8374,0.8046,0.8685,0
+logreg__none__A,race_eth,Non-Hispanic White,34,0.9000,0.8529,0.9412,0.8930,0.8663,0.9176,0
+logreg__none__A,race_eth,Other / multiracial,34,0.8353,0.7882,0.8825,0.8089,0.7697,0.8442,0
+logreg__none__A,race_eth,Other Hispanic,34,0.8882,0.8529,0.9235,0.8610,0.8420,0.8791,0
+logreg__none__A,sex,female,102,0.8549,0.8294,0.8804,0.8580,0.8404,0.8744,0
+logreg__none__A,sex,male,102,0.8706,0.8431,0.8941,0.8645,0.8487,0.8797,0

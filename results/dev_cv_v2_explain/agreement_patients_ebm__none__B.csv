@@ -1,0 +1,205 @@
+top5_overlap,spearman,run,patient,race_eth,sex
+0.2000,0.6687,ebm__none__B,10617,Mexican American,female
+0.8000,0.6857,ebm__none__B,10831,Mexican American,female
+0.6000,0.7053,ebm__none__B,1540,Mexican American,female
+0.6000,0.5261,ebm__none__B,11035,Mexican American,female
+0.4000,0.5842,ebm__none__B,12924,Mexican American,female
+0.8000,0.6538,ebm__none__B,1695,Mexican American,female
+0.6000,0.8019,ebm__none__B,3903,Mexican American,female
+0.4000,0.7274,ebm__none__B,7120,Mexican American,female
+0.6000,0.6576,ebm__none__B,11771,Mexican American,female
+0.6000,0.5696,ebm__none__B,11295,Mexican American,female
+0.6000,0.6358,ebm__none__B,8385,Mexican American,female
+0.4000,0.6227,ebm__none__B,8180,Mexican American,female
+0.6000,0.7191,ebm__none__B,7027,Mexican American,female
+0.4000,0.5051,ebm__none__B,10288,Mexican American,female
+0.6000,0.5942,ebm__none__B,1533,Mexican American,female
+0.6000,0.5146,ebm__none__B,11029,Mexican American,female
+0.6000,0.6306,ebm__none__B,9727,Mexican American,female
+0.4000,0.6938,ebm__none__B,922,Mexican American,male
+0.6000,0.5690,ebm__none__B,970,Mexican American,male
+0.4000,0.7246,ebm__none__B,2802,Mexican American,male
+0.4000,0.5846,ebm__none__B,9479,Mexican American,male
+0.2000,0.7872,ebm__none__B,9679,Mexican American,male
+0.6000,0.4970,ebm__none__B,10911,Mexican American,male
+0.6000,0.6257,ebm__none__B,10239,Mexican American,male
+0.4000,0.6816,ebm__none__B,11794,Mexican American,male
+0.4000,0.5826,ebm__none__B,5246,Mexican American,male
+0.4000,0.7403,ebm__none__B,11555,Mexican American,male
+0.4000,0.6895,ebm__none__B,10509,Mexican American,male
+0.6000,0.5801,ebm__none__B,7846,Mexican American,male
+0.4000,0.3218,ebm__none__B,6572,Mexican American,male
+0.4000,0.7139,ebm__none__B,8950,Mexican American,male
+0.8000,0.5690,ebm__none__B,4321,Mexican American,male
+0.4000,0.6143,ebm__none__B,11190,Mexican American,male
+0.8000,0.5300,ebm__none__B,12765,Mexican American,male
+0.4000,0.6246,ebm__none__B,7053,Other Hispanic,female
+0.6000,0.7251,ebm__none__B,2130,Other Hispanic,female
+0.6000,0.6176,ebm__none__B,9560,Other Hispanic,female
+0.6000,0.6627,ebm__none__B,11774,Other Hispanic,female
+0.4000,0.5983,ebm__none__B,9512,Other Hispanic,female
+0.2000,0.6415,ebm__none__B,2519,Other Hispanic,female
+0.6000,0.7358,ebm__none__B,987,Other Hispanic,female
+0.4000,0.5690,ebm__none__B,6978,Other Hispanic,female
+0.4000,0.6507,ebm__none__B,1743,Other Hispanic,female
+0.6000,0.7184,ebm__none__B,8227,Other Hispanic,female
+0.6000,0.5801,ebm__none__B,3053,Other Hispanic,female
+0.4000,0.5732,ebm__none__B,7154,Other Hispanic,female
+0.6000,0.7782,ebm__none__B,10638,Other Hispanic,female
+0.6000,0.4811,ebm__none__B,5439,Other Hispanic,female
+0.4000,0.7205,ebm__none__B,6756,Other Hispanic,female
+0.2000,0.5315,ebm__none__B,4601,Other Hispanic,female
+0.6000,0.7863,ebm__none__B,12448,Other Hispanic,female
+0.6000,0.6908,ebm__none__B,10796,Other Hispanic,male
+0.2000,0.5666,ebm__none__B,6143,Other Hispanic,male
+0.4000,0.6544,ebm__none__B,7931,Other Hispanic,male
+0.6000,0.5919,ebm__none__B,10809,Other Hispanic,male
+0.4000,0.4413,ebm__none__B,7269,Other Hispanic,male
+0.4000,0.3901,ebm__none__B,3645,Other Hispanic,male
+0.6000,0.3090,ebm__none__B,8174,Other Hispanic,male
+0.6000,0.3638,ebm__none__B,6233,Other Hispanic,male
+0.4000,0.5118,ebm__none__B,10138,Other Hispanic,male
+0.6000,0.5807,ebm__none__B,77,Other Hispanic,male
+0.6000,0.7266,ebm__none__B,10762,Other Hispanic,male
+0.4000,0.6782,ebm__none__B,9728,Other Hispanic,male
+0.4000,0.5833,ebm__none__B,10869,Other Hispanic,male
+0.8000,0.7032,ebm__none__B,11152,Other Hispanic,male
+0.4000,0.6462,ebm__none__B,10879,Other Hispanic,male
+0.4000,0.5595,ebm__none__B,2536,Other Hispanic,male
+0.2000,0.5679,ebm__none__B,1900,Other Hispanic,male
+0.6000,0.7542,ebm__none__B,9988,Non-Hispanic White,female
+0.6000,0.4227,ebm__none__B,10473,Non-Hispanic White,female
+0.6000,0.4788,ebm__none__B,3709,Non-Hispanic White,female
+0.4000,0.6002,ebm__none__B,2949,Non-Hispanic White,female
+0.6000,0.4957,ebm__none__B,3217,Non-Hispanic White,female
+0.6000,0.7030,ebm__none__B,4646,Non-Hispanic White,female
+0.8000,0.7829,ebm__none__B,12917,Non-Hispanic White,female
+0.4000,0.7113,ebm__none__B,458,Non-Hispanic White,female
+0.2000,0.7570,ebm__none__B,5338,Non-Hispanic White,female
+0.4000,0.6400,ebm__none__B,6958,Non-Hispanic White,female
+0.4000,0.6887,ebm__none__B,5646,Non-Hispanic White,female
+0.6000,0.6278,ebm__none__B,406,Non-Hispanic White,female
+0.2000,0.7953,ebm__none__B,4085,Non-Hispanic White,female
+0.8000,0.5929,ebm__none__B,13060,Non-Hispanic White,female
+0.6000,0.6632,ebm__none__B,7471,Non-Hispanic White,female
+0.6000,0.5296,ebm__none__B,10932,Non-Hispanic White,female
+0.0000,0.5462,ebm__none__B,1260,Non-Hispanic White,female
+0.4000,0.6075,ebm__none__B,6491,Non-Hispanic White,male
+0.6000,0.5143,ebm__none__B,8723,Non-Hispanic White,male
+0.2000,0.5694,ebm__none__B,4253,Non-Hispanic White,male
+0.6000,0.6030,ebm__none__B,10318,Non-Hispanic White,male
+0.4000,0.6583,ebm__none__B,1979,Non-Hispanic White,male
+0.6000,0.7225,ebm__none__B,5981,Non-Hispanic White,male
+0.6000,0.5765,ebm__none__B,12233,Non-Hispanic White,male
+0.8000,0.6512,ebm__none__B,1402,Non-Hispanic White,male
+0.4000,0.7146,ebm__none__B,11592,Non-Hispanic White,male
+0.6000,0.6953,ebm__none__B,4388,Non-Hispanic White,male
+0.6000,0.5028,ebm__none__B,2088,Non-Hispanic White,male
+0.6000,0.7495,ebm__none__B,291,Non-Hispanic White,male
+0.4000,0.5405,ebm__none__B,2180,Non-Hispanic White,male
+0.4000,0.5966,ebm__none__B,1216,Non-Hispanic White,male
+0.6000,0.6415,ebm__none__B,9711,Non-Hispanic White,male
+0.4000,0.5702,ebm__none__B,8935,Non-Hispanic White,male
+0.4000,0.5499,ebm__none__B,8997,Non-Hispanic White,male
+0.6000,0.6790,ebm__none__B,9961,Non-Hispanic Black,female
+0.6000,0.5947,ebm__none__B,11785,Non-Hispanic Black,female
+0.6000,0.7077,ebm__none__B,3798,Non-Hispanic Black,female
+0.4000,0.7128,ebm__none__B,12712,Non-Hispanic Black,female
+0.6000,0.5914,ebm__none__B,9330,Non-Hispanic Black,female
+0.4000,0.6064,ebm__none__B,9611,Non-Hispanic Black,female
+0.6000,0.4874,ebm__none__B,4156,Non-Hispanic Black,female
+0.6000,0.6976,ebm__none__B,2943,Non-Hispanic Black,female
+0.4000,0.6831,ebm__none__B,2933,Non-Hispanic Black,female
+0.2000,0.5525,ebm__none__B,2957,Non-Hispanic Black,female
+0.6000,0.5835,ebm__none__B,9049,Non-Hispanic Black,female
+0.6000,0.7265,ebm__none__B,10408,Non-Hispanic Black,female
+0.4000,0.6752,ebm__none__B,10193,Non-Hispanic Black,female
+0.6000,0.4910,ebm__none__B,5444,Non-Hispanic Black,female
+0.4000,0.5790,ebm__none__B,5367,Non-Hispanic Black,female
+0.4000,0.7332,ebm__none__B,12447,Non-Hispanic Black,female
+0.6000,0.5553,ebm__none__B,6049,Non-Hispanic Black,female
+0.6000,0.6923,ebm__none__B,8181,Non-Hispanic Black,male
+0.4000,0.3869,ebm__none__B,7762,Non-Hispanic Black,male
+0.4000,0.6901,ebm__none__B,9101,Non-Hispanic Black,male
+0.6000,0.7767,ebm__none__B,7156,Non-Hispanic Black,male
+0.4000,0.5540,ebm__none__B,8307,Non-Hispanic Black,male
+0.6000,0.5985,ebm__none__B,1084,Non-Hispanic Black,male
+0.4000,0.5807,ebm__none__B,1580,Non-Hispanic Black,male
+0.6000,0.5897,ebm__none__B,9720,Non-Hispanic Black,male
+0.6000,0.5882,ebm__none__B,4792,Non-Hispanic Black,male
+0.4000,0.4452,ebm__none__B,244,Non-Hispanic Black,male
+0.4000,0.5811,ebm__none__B,3330,Non-Hispanic Black,male
+0.6000,0.6285,ebm__none__B,5879,Non-Hispanic Black,male
+0.4000,0.5994,ebm__none__B,965,Non-Hispanic Black,male
+0.6000,0.5053,ebm__none__B,4988,Non-Hispanic Black,male
+0.4000,0.5822,ebm__none__B,9602,Non-Hispanic Black,male
+0.6000,0.6812,ebm__none__B,11204,Non-Hispanic Black,male
+0.2000,0.6038,ebm__none__B,7898,Non-Hispanic Black,male
+0.4000,0.6929,ebm__none__B,12772,Non-Hispanic Asian,female
+0.6000,0.7013,ebm__none__B,4009,Non-Hispanic Asian,female
+0.6000,0.7700,ebm__none__B,3452,Non-Hispanic Asian,female
+0.4000,0.6871,ebm__none__B,5322,Non-Hispanic Asian,female
+0.4000,0.6437,ebm__none__B,828,Non-Hispanic Asian,female
+0.4000,0.6107,ebm__none__B,12545,Non-Hispanic Asian,female
+0.6000,0.5366,ebm__none__B,5843,Non-Hispanic Asian,female
+0.4000,0.6173,ebm__none__B,1049,Non-Hispanic Asian,female
+0.6000,0.7750,ebm__none__B,7667,Non-Hispanic Asian,female
+0.8000,0.7086,ebm__none__B,7365,Non-Hispanic Asian,female
+0.4000,0.6144,ebm__none__B,10218,Non-Hispanic Asian,female
+0.6000,0.5972,ebm__none__B,7262,Non-Hispanic Asian,female
+0.6000,0.6000,ebm__none__B,5632,Non-Hispanic Asian,female
+0.4000,0.6432,ebm__none__B,3554,Non-Hispanic Asian,female
+0.2000,0.6780,ebm__none__B,275,Non-Hispanic Asian,female
+0.6000,0.7283,ebm__none__B,5015,Non-Hispanic Asian,female
+0.6000,0.6732,ebm__none__B,1787,Non-Hispanic Asian,female
+0.4000,0.7094,ebm__none__B,216,Non-Hispanic Asian,male
+0.4000,0.6884,ebm__none__B,3299,Non-Hispanic Asian,male
+0.6000,0.6146,ebm__none__B,8594,Non-Hispanic Asian,male
+0.6000,0.6355,ebm__none__B,5139,Non-Hispanic Asian,male
+0.6000,0.6621,ebm__none__B,1651,Non-Hispanic Asian,male
+0.4000,0.3857,ebm__none__B,3609,Non-Hispanic Asian,male
+0.6000,0.6008,ebm__none__B,11653,Non-Hispanic Asian,male
+0.4000,0.7525,ebm__none__B,6787,Non-Hispanic Asian,male
+0.6000,0.8071,ebm__none__B,90,Non-Hispanic Asian,male
+0.4000,0.6321,ebm__none__B,3277,Non-Hispanic Asian,male
+0.4000,0.5818,ebm__none__B,4147,Non-Hispanic Asian,male
+0.4000,0.4349,ebm__none__B,3475,Non-Hispanic Asian,male
+0.2000,0.5844,ebm__none__B,1344,Non-Hispanic Asian,male
+0.6000,0.6961,ebm__none__B,8655,Non-Hispanic Asian,male
+0.4000,0.5672,ebm__none__B,1422,Non-Hispanic Asian,male
+0.6000,0.6165,ebm__none__B,6995,Non-Hispanic Asian,male
+0.6000,0.6026,ebm__none__B,10592,Non-Hispanic Asian,male
+0.4000,0.6709,ebm__none__B,7107,Other / multiracial,female
+0.4000,0.7002,ebm__none__B,10426,Other / multiracial,female
+0.6000,0.7038,ebm__none__B,12183,Other / multiracial,female
+0.6000,0.5732,ebm__none__B,8617,Other / multiracial,female
+0.2000,0.5469,ebm__none__B,4409,Other / multiracial,female
+0.4000,0.6180,ebm__none__B,8472,Other / multiracial,female
+0.4000,0.5036,ebm__none__B,12369,Other / multiracial,female
+0.6000,0.7955,ebm__none__B,5348,Other / multiracial,female
+0.6000,0.5925,ebm__none__B,3092,Other / multiracial,female
+0.4000,0.6612,ebm__none__B,12373,Other / multiracial,female
+0.6000,0.7355,ebm__none__B,6071,Other / multiracial,female
+0.6000,0.5396,ebm__none__B,10477,Other / multiracial,female
+0.6000,0.7625,ebm__none__B,7084,Other / multiracial,female
+0.4000,0.5225,ebm__none__B,4653,Other / multiracial,female
+0.6000,0.6499,ebm__none__B,13123,Other / multiracial,female
+0.6000,0.5356,ebm__none__B,4525,Other / multiracial,female
+0.4000,0.6430,ebm__none__B,3965,Other / multiracial,female
+0.4000,0.6600,ebm__none__B,5635,Other / multiracial,male
+0.6000,0.5375,ebm__none__B,4430,Other / multiracial,male
+0.2000,0.6585,ebm__none__B,10313,Other / multiracial,male
+0.4000,0.5850,ebm__none__B,7032,Other / multiracial,male
+0.6000,0.7370,ebm__none__B,10400,Other / multiracial,male
+0.6000,0.5719,ebm__none__B,4898,Other / multiracial,male
+0.4000,0.6355,ebm__none__B,109,Other / multiracial,male
+0.4000,0.4591,ebm__none__B,11881,Other / multiracial,male
+0.4000,0.5841,ebm__none__B,6179,Other / multiracial,male
+0.6000,0.6752,ebm__none__B,9113,Other / multiracial,male
+0.6000,0.7617,ebm__none__B,1169,Other / multiracial,male
+0.2000,0.6765,ebm__none__B,1563,Other / multiracial,male
+0.4000,0.6441,ebm__none__B,3575,Other / multiracial,male
+0.4000,0.6000,ebm__none__B,6596,Other / multiracial,male
+0.6000,0.5103,ebm__none__B,5763,Other / multiracial,male
+0.4000,0.6597,ebm__none__B,10434,Other / multiracial,male
+0.6000,0.5906,ebm__none__B,11305,Other / multiracial,male
