@@ -249,3 +249,38 @@ n_iter. A restart skips a combination only if the hash matches.
     - logistic regression / A, B, C
     - XGBoost / A
   - **Restart:** after a reboot, and only once at least 3 GB of memory is free.
+
+- **2026-11-02: survey-weighted discrimination (sensitivity), and bootstrap bands for the
+  decision curve and subgroup tables.** Added after the development run had finished, written
+  before any of these analyses was run. Development data (2011-2016) only; 2017-2018 is not read.
+  - **Why:** until now the survey weights were used only for prevalence (`prevalence_report`,
+    WTMEC2YR for the main label, divided by the number of pooled cycles). Every model metric was
+    unweighted, so none of them describes the US adult population. The decision curve and the
+    subgroup tables had point estimates only.
+  - **Weighted sensitivity analysis:**
+    - **Model:** the primary model on the primary set, from the selection rules
+      (`results/dev_cv_v2_selection.json`). No refit and no retuning: the existing out-of-fold
+      predictions, averaged over the 3 repeats, are scored.
+    - **Weights:** WTMEC2YR / 3 pooled, and WTMEC2YR within each cycle. The weights enter only the
+      metric (`sample_weight`), never training.
+    - **Metrics:** weighted ROC-AUC and weighted PR-AUC (average precision), each next to the
+      unweighted value on the same pooled out-of-fold predictions. Weighted PR-AUC is read
+      against the weighted prevalence (about 2.1 %), not the unweighted 3.1 %.
+    - **Intervals:** percentile bootstrap, 1000 resamples of persons (seed 42), with each person
+      keeping their weight. This **ignores the NHANES design** (strata SDMVSTRA and PSUs
+      SDMVPSU are not in the development file, and adding them would change the data hash), so
+      the intervals are too narrow and are only approximate.
+    - **The unweighted results stay primary.** The weighted results change no selection rule.
+    - **Output:** `results/dev_cv_v2_weighted.csv`.
+  - **Bootstrap bands:** 1000 resamples of persons, seed 42, percentile 95 % intervals.
+    - **Decision curve:** the pre-specified 1-5 % threshold window. Net benefit of each plotted
+      model, of treat-all, and of each model minus treat-all, with every model scored on the
+      same resamples. Output `results/dev_cv_v2_dca.csv` / `.png`.
+    - **Subgroups (sex, race/ethnicity):** PR-AUC, ROC-AUC, calibration slope and O/E, resampled
+      within each subgroup. Groups with fewer than 30 positives are still flagged unreliable.
+      Output `results/dev_cv_v2_subgroups_<model>__<strategy>__<set>.csv`.
+  - **Ported to v2:** `scripts/dev_dca.py` and `scripts/dev_subgroups.py` read the v1 build
+    (`data/processed/nhanes.parquet`, which also holds 2017-2018) and the v1 out-of-fold files.
+    They now read `data/processed/nhanes_dev.parquet` and `reports/dev_cv_v2_oof/` and check the
+    combination hash. The threshold window, subgroup variables and the 30-positive flag are
+    unchanged.
