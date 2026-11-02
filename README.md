@@ -57,6 +57,12 @@ tests/        synthetic-data tests (no downloads needed)
 
 ## Results: development (2011-2016) and the single 2017-2018 temporal test
 
+> **2017-2018 was not untouched.** Before this analysis plan existed, the old v1 pipeline scored
+> an XGBoost model on 2017-2018 once (commit `df1b305`: PR-AUC 0.101, ROC-AUC 0.776, prevalence
+> 3.8 %). No v2 selection rule used that result. The test below is the first and only scoring of
+> the pre-specified v2 model, but not the first look at the cycle (deviation 2026-11-02 in
+> `docs/analysis_plan.md`).
+
 Pre-specified in `docs/analysis_plan.md` (section 9 and the deviations). The test was scored
 **once** from the commit tagged `pre-test` (`6795066`); its results are in
 `results/test_2017_2018/` (commit `befb8b1`), with every hash in `run_log.json`. The primary
@@ -129,6 +135,25 @@ excludes 0 throughout.
 3. **The recalibrated O/E interval is degenerate (1.00-1.00).** The intercept is re-estimated in
    every resample, which forces O/E to 1. This is a property of the method, not a result.
 4. **PR-AUC is not comparable across prevalences.** Read it against prevalence; the ratio fell.
+
+**Post-test, exploratory, not used for any decision** (`scripts/post_test_exploratory.py`,
+`results/post_test_exploratory/`). These were computed from the saved test predictions only, with
+no model fitted, refitted or rescored. Bootstrap: 1000 resamples, seed 42.
+
+| Comparison | Difference | 95 % CI |
+|---|---|---|
+| Primary − ADA-style, ROC-AUC (unweighted) | 0.063 | 0.040 to 0.087 |
+| Primary − ADA-style, PR-AUC (unweighted) | 0.035 | 0.023 to 0.057 |
+| Primary − ADA-style, ROC-AUC (weighted) | 0.072 | 0.036 to 0.109 |
+| Primary − ADA-style, PR-AUC (weighted) | 0.034 | 0.019 to 0.061 |
+| Women − men, ROC-AUC | 0.089 | 0.022 to 0.154 |
+| Women − men, PR-AUC | 0.077 | 0.025 to 0.150 |
+| Women − men, calibration slope | 0.34 | 0.06 to 0.63 |
+
+- **Calibration by sex:** O/E was 1.14 for women (0.90–1.37) and 0.83 for men (0.64–1.02).
+- **In men:** predicted risks in the top fifth averaged 11.7 %, against 8.2 % observed, so risks were too high at the top. In the second fifth they were 1.3 % predicted against 2.8 % observed, so too low at the low end.
+- **In women:** the top fifth was slightly underestimated (10.9 % predicted vs 13.5 % observed).
+- **Caution:** this rests on 67 male and 90 female positives, and it was looked for only after the results were seen.
 
 ## Notes on honesty
 
