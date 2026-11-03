@@ -16,8 +16,12 @@ jobs:
         run: pip install ruff pytest
       - name: Lint
         run: ruff check .
+      # Plain `pip install torch` on Linux pulls the CUDA toolkit (several GB) and the runner
+      # runs out of disk ("No space left on device"). The tests need CPU torch only.
+      - name: Install CPU-only torch
+        run: pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
       - name: Install project deps
-        run: pip install -r requirements.txt
+        run: pip install --no-cache-dir -r requirements.txt
       - name: Test (synthetic data, no downloads)
         run: pytest -q
       - name: Demo (scores the sample patient with the committed portable model)
