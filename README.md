@@ -1,22 +1,75 @@
 # GlucoSense-AI
 
-Calibrated, explainable screening for **undiagnosed diabetes** from non-laboratory features.
+Screening for **undiagnosed diabetes** in US adults from information collected without a
+blood test.
 
-- **Main data:** NHANES 2011-2018 (4 cycles). Lab values and survey weights are used only to build labels and prevalence estimates, never as features.
-  - **Analysis sample:** adults >= 20 y with HbA1c measured and no self-reported diagnosis (DIQ010 not 1). Excluded: refused/don't know on DIQ010 (7, 9) and anyone taking insulin (DIQ050) or diabetes pills (DIQ070) without a diagnosis. Borderline (DIQ010 = 3) is kept.
-  - **Main label** `undiagnosed_diabetes`: HbA1c >= 6.5 %.
-  - **Sensitivity label** `undiagnosed_diabetes_a1c_or_fpg` (sensitivity analysis only): HbA1c >= 6.5 % or fasting plasma glucose >= 126 mg/dL, defined only for the fasting subsample (missing otherwise).
-  - **Prevalence** is reported unweighted and survey-weighted, per cycle and pooled: WTMEC2YR for the main label, WTSAF2YR for the sensitivity label, each divided by the number of cycles when pooling. Current build (v2, development cycles 2011-2016 only): main label 3.1 % unweighted / 2.1 % weighted (pooled, n = 13,189, 410 positives); sensitivity label 5.6 % / 4.0 % (fasting subsample, n = 5,905).
-- **External validation:** BRFSS (overlapping features only).
-- **Validation design:** nested 5-fold CV, plus temporal split (train on earlier NHANES cycles, test on the latest).
-- **Models:** XGBoost, PyTorch MLP, TabNet.
-- **Baselines** (same nested-CV folds and preprocessing): L2 logistic regression with tuned C, and an **ADA-style** risk score. The ADA-style score approximates the ADA Type 2 Diabetes Risk Test with the columns available; it is not the official score.
-  - Included: age, sex, family history (MCQ300C, any close relative), BMI (official cut-offs), and high blood pressure as a **proxy** (measured SBP >= 140 or DBP >= 90; the official item is a diagnosis or medication).
-  - Missing (scored 0): physical activity and gestational diabetes. Maximum 9 of the official 11 points; a missing value scores 0.
-  - Points are mapped to risk by a one-variable logistic regression fit on each training fold.
-- **Imbalance strategies compared:** none, class weighting, SMOTE-NC (always applied inside CV folds).
-- **Metrics:** PR-AUC (primary), ROC-AUC, Brier score, calibration curve, Decision Curve Analysis.
-- **Explainability:** SHAP (global + local), LIME consistency check, DiCE counterfactuals with immutable features.
+> **Summary**
+>
+> - **Question:** can routine, non-laboratory information find adults who have diabetes but
+>   don't know it (HbA1c ≥ 6.5 %, no diagnosis)?
+> - **Data:** NHANES. Development: 2011-2016 (n = 13,189; 410 positives). One temporal test:
+>   2017-2018 (n = 4,095; 157 positives). Rules fixed in advance in `docs/analysis_plan.md`.
+> - **Primary model:** L2 logistic regression on 10 inputs (age, sex, BMI, waist, height,
+>   systolic and diastolic BP, family history of diabetes, ever smoked, race/ethnicity), chosen
+>   by pre-specified rules, frozen at the tag `pre-test` and scored once.
+> - **Test result (95 % bootstrap CI):**
+>   - ROC-AUC **0.780** (0.749-0.811), against 0.805 in development.
+>   - PR-AUC **0.107** (0.085-0.139), at a prevalence of 3.8 %.
+>   - Calibration slope **0.89** (0.76-1.02), O/E **0.98** (0.84-1.13).
+>   - Better than an ADA-style score: ROC-AUC +0.063 (0.040-0.087).
+>   - Net benefit above treat-all at every threshold from 1 % to 5 %.
+> - **Caveats:**
+>   1. **2017-2018 was not untouched.** An earlier v1 model scored it once before the plan
+>      existed. No v2 decision used that result.
+>   2. **The model was worse for men than for women in the test only.** ROC-AUC was 0.730 for
+>      men and 0.819 for women, a difference of +0.089 (0.022-0.154). In development the sexes
+>      were alike (−0.002, −0.036 to 0.034). This was found after scoring and rests on 67 male
+>      positives.
+> - **Try it:** `python scripts/demo.py` (see [Demo](#demo-one-command-no-data-download)).
+>   Model card: [`docs/model_card.md`](docs/model_card.md). Reporting checklist:
+>   [`docs/tripod_ai_checklist.md`](docs/tripod_ai_checklist.md).
+>
+> Research only; not a medical device.
+
+## Study design (v2)
+
+- **Data:** NHANES 2011-2012, 2013-2014 and 2015-2016 for development. 2017-2018 is held out
+  for one temporal test.
+  - **Lab values** are used only to build labels, and **survey weights** only for prevalence and
+    weighted secondary metrics. Neither is ever a feature.
+- **Analysis sample:**
+  - adults ≥ 20 years with HbA1c measured, not pregnant, and no self-reported diagnosis
+    (DIQ010 not 1, 7 or 9; borderline kept);
+  - not taking insulin or diabetes pills.
+- **Main label:** HbA1c ≥ 6.5 %. The sensitivity label (HbA1c ≥ 6.5 % or FPG ≥ 126 mg/dL, fasting
+  subsample, with FPG back-adjusted for the 2015 analyser change) is used in a secondary analysis
+  only.
+- **Prevalence, development:** 3.1 % unweighted, 2.1 % weighted (WTMEC2YR/3).
+- **Feature sets:** nested, A ⊂ B ⊂ C, plus D for sensitivity only.
+  - **A (10):** the inputs above.
+  - **B (+30):** activity, sleep, smoking, alcohol, diet, hypertension, gestational diabetes and
+    weight history.
+  - **C (+3):** education, income and food security.
+  - **D (+4):** healthcare access.
+- **Models:** L2 logistic regression, XGBoost, MLP and EBM on every set. Rebalancing variants and
+  TabNet run on set A only. The ADA-style score is a comparator.
+- **Validation:**
+  - nested CV (5 outer folds × 3 repeats, inner 3-fold tuning);
+  - leave-one-cycle-out;
+  - paired model and set comparisons with Nadeau-Bengio intervals;
+  - then the single 2017-2018 test.
+- **Selection rules** (pre-specified): the primary set, then the primary model, chosen on PR-AUC
+  with a simplicity tie-break. Result: set A, logistic regression.
+- **Metrics:**
+  - PR-AUC (primary), ROC-AUC, Brier;
+  - calibration slope, intercept and O/E;
+  - decision curves over 1-5 %;
+  - subgroups by sex and race/ethnicity;
+  - survey-weighted versions.
+- **Explanations** (exploratory, development only): SHAP vs LIME agreement, stability, DiCE
+  counterfactuals.
+- **External validation (BRFSS):** **future work, not done.** `src/data/brfss.py` is an unused
+  loader. BRFSS has no labs, so it can test only self-reported diabetes, a different outcome.
 
 ## Demo (one command, no data download)
 
@@ -36,41 +89,44 @@ aggregate parameters and coefficients only, with no NHANES records.
 It is a research demo, not a diagnosis. See `docs/model_card.md`, `docs/tripod_ai_checklist.md`
 and `LICENSE`, which covers the code only (MIT); NHANES data are public and not redistributed.
 
-## Quick start
+## Reproduce the v2 study
 
 ```bash
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m src.data.nhanes --download                 # builds 2011-2016 only (dev data v2)
-# development analysis v2 (docs/analysis_plan.md): models x feature sets A-D, 5-fold x 3
-# repeats nested CV, leave-one-cycle-out; checkpointed to results/dev_cv_v2/
-python scripts/run_dev.py
-# v1 (earlier, set A only): nested CV on 2011-2016 only; each model/strategy is checkpointed to results/dev_cv/ and
-# skipped on restart if config + seed + n_iter are unchanged
-python scripts/run_experiment.py --config configs/config.yaml --n-iter 5
-python scripts/run_experiment.py --models logreg,ada_style --strategies none --n-iter 5   # baselines
-python scripts/summarize_dev_cv.py                   # rebuild results/dev_cv_summary.csv any time
-# the single 2017-2018 temporal test (docs/analysis_plan.md section 9; already run, do not rerun)
+python -m src.data.nhanes --download                 # builds 2011-2016 only (refuses 2017-2018)
+python scripts/run_dev.py                            # nested CV, sets A-D, LOCO, selection rules
+python scripts/dev_subgroups.py                      # subgroups (sex, race/ethnicity), development
+python scripts/dev_dca.py                            # decision curves, development
+python scripts/dev_weighted.py                       # survey-weighted metrics, development
+python scripts/dev_explain.py --stage fit,shap       # explanations (SHAP, LIME, stability)
+python scripts/dev_explain.py --stage dice           # DiCE counterfactuals
+python scripts/dev_sex_gap.py                        # women vs men, development (exploratory)
+# the single 2017-2018 temporal test (plan section 9): ALREADY RUN, do not rerun
 python -m src.data.nhanes --test                     # builds 2017-2018 alone, same rules
 python scripts/run_test.py --stage fit               # 2011-2016 only: refit, hashes, run log
 python scripts/run_test.py --stage score             # refuses unless tree clean, tag pre-test, hashes match
-# v1 (before the plan) temporal run of XGBoost, kept as a record (results/temporal_test.csv)
-python scripts/run_experiment.py --mode temporal --models xgboost --strategies none
+python scripts/post_test_exploratory.py              # post-test exploratory, from saved predictions
 ```
 
-Results (metrics CSV, plots) are written to `reports/`.
+Every development combination is checkpointed with a hash of its data, settings and features,
+and skipped on restart when the hash matches.
 
 ## Layout
 
 ```
-configs/      experiment settings
-src/data/     NHANES + BRFSS loaders
-src/preprocessing/  KNN imputation, RobustScaler, SMOTE-NC pipeline
-src/models/   XGBoost, MLP, TabNet wrappers (sklearn-compatible)
-src/evaluation/     nested CV, metrics, DCA
-src/explain/  SHAP, LIME, DiCE
-src/app/      FastAPI service + Streamlit dashboard
-tests/        synthetic-data tests (no downloads needed)
+configs/            experiment settings (feature sets, CV, seeds)
+docs/               analysis plan (the rules), feature audit, model card, TRIPOD+AI checklist
+src/data/           NHANES build (labels, exclusions, derived features); BRFSS loader (unused)
+src/preprocessing/  leakage-safe pipeline: KNN/mode imputation, RobustScaler, encoders
+src/models/         model wrappers, ADA-style score, portable JSON model
+src/evaluation/     nested CV, LOCO, selection rules, metrics, DCA, subgroups
+src/explain/        SHAP, LIME, DiCE analysis
+src/app/            v1 prototype (FastAPI + Streamlit), not wired to the v2 model
+scripts/            entry points (above); demo.py
+models/, examples/  portable demo model and a fictional sample patient
+results/            committed results (aggregates and predictions; no NHANES records)
+tests/              synthetic-data tests (no downloads needed)
 ```
 
 ## Results: development (2011-2016) and the single 2017-2018 temporal test
@@ -187,6 +243,76 @@ In development there was no gap between women and men; it appeared only in 2017-
 - **In women:** the top fifth was slightly underestimated (10.9 % predicted vs 13.5 % observed).
 - **Caution:** this rests on 67 male and 90 female positives, and it was looked for only after the results were seen.
 
+**Set-A inputs in the 2017-2018 codebooks.** This was checked after the test, so any difference
+would be a post-test finding; none was found, and nothing was rerun.
+
+- **Codebooks compared:** the CDC NHANES documentation for DEMO, BMX, BPX, MCQ and SMQ, 2017-2018
+  (`_J`) against 2011-2012 (`_G`); for MCQ300C also 2013-2014 (`_H`) and 2015-2016 (`_I`).
+- **Raw files:** the 2017-2018 files hold the same variable names as the development files. Only
+  the column names were read, not the values.
+
+| Input | NHANES variable | 2017-2018 vs 2011-2016 |
+|---|---|---|
+| age | RIDAGEYR | Same; top-coded at 80 in both |
+| sex | RIAGENDR | Same codes (1 male, 2 female) |
+| race/ethnicity | RIDRETH3 | Same codes (1, 2, 3, 4, 6, 7; no 5) |
+| BMI, waist, height | BMXBMI, BMXWAIST, BMXHT | Same names and units (kg/m², cm) |
+| systolic, diastolic BP | BPXSY1-4, BPXDI1-4 | Same names, same 3 (+1) reading protocol; a diastolic of 0 is a valid value in both |
+| family history | MCQ300C | Same question, codes (1 yes, 2 no, 7, 9) and target (20+); the codebook writes the name `MCQ300c` in every cycle |
+| ever smoked 100 cigarettes | SMQ020 | Same question and codes. The target age is 18+ in 2017-2018 and 20+ in 2011-2012, which doesn't matter because the sample is 20+ |
+
+- **Not checked:** the set-B codebooks beyond the alcohol redesign (see Limitations).
+- **Known limitation, same in every cycle:** systolic and diastolic BP are means of the available
+  readings, and a diastolic reading of 0 enters that mean unchanged.
+
+## Explainability results (development only, exploratory)
+
+These come from `results/dev_cv_v2_explain/` (`scripts/dev_explain.py`; method in the plan,
+deviation 2026-11-02 B). They are explanations of the model, not of what causes diabetes.
+
+**SHAP vs LIME agreement**, from held-out explanations of 204 patients (17 per race/ethnicity ×
+sex cell). Values are means with bootstrap 95 % CIs.
+
+| | Logistic regression / A (primary) | EBM / B (secondary) |
+|---|---|---|
+| Top-5 overlap | 0.86 (0.85-0.88) | 0.49 (0.47-0.51) |
+| Spearman, \|SHAP\| vs \|LIME\| | 0.86 (0.85-0.87) | 0.62 (0.61-0.63) |
+| Range across race/ethnicity × sex groups | 0.83-0.90 overlap | 0.48-0.52 overlap |
+
+**Stability of global SHAP importance**, as the mean pairwise Spearman between models:
+
+| | Logistic regression / A | EBM / B |
+|---|---|---|
+| 15 outer-fold models | 0.96 (0.94-0.96) | 0.84 (0.83-0.85) |
+| 3 leave-one-cycle-out models | 0.92 (0.91-0.94) | 0.72 (0.70-0.74) |
+
+For the primary model, the ranking is waist (1st in every model), age (2nd), race/ethnicity and
+family history (3rd-4th), then sex, height and systolic BP. BMI, smoking and diastolic BP come
+last. With 40 inputs, EBM's explanations are less stable: SHAP and LIME agree only on about half
+of the top 5.
+
+**DiCE counterfactuals.** These are 20 patients with predicted risk ≥ 3 %, with 3
+counterfactuals each that bring the predicted risk below 3 %. Age, sex, height, race/ethnicity,
+family history and smoking were held fixed.
+
+| | Logistic regression / A | EBM / B |
+|---|---|---|
+| Found / requested | 60 / 60 | 60 / 60 |
+| Validity (rescored < 3 %) | 100 % | 100 % |
+| Sparsity (features changed, mean) | 1.6 | 1.8 |
+| Proximity (mean change in training MADs) | 4.8 | 27.7 |
+| All changed values within the training 1st-99th percentile | 37 % | 12 % |
+| No change to unchangeable history items | 100 % | 48 % |
+| **Plausible (both of the above)** | **37 %** | **7 %** |
+
+**Most counterfactuals are not realistic.** They always reach the target and change only one or
+two inputs. But 63 % (logistic regression) and 93 % (EBM) need changes that fall outside the
+range seen in training, or rewrite the patient's history.
+- One example cuts waist from 120 cm to 67 cm.
+- Another sets diastolic BP to 2 mmHg.
+
+They show what the model responds to; they are not advice for any person.
+
 ## Notes on honesty
 
 - Counterfactuals are model explanations, not causal advice.
@@ -234,12 +360,39 @@ In development there was no gap between women and men; it appeared only in 2017-
   2017-2018 once (commit `df1b305`: PR-AUC 0.101, ROC-AUC 0.776, prevalence 3.8 %, v1 rules). No
   selection rule used it, but the cycle's prevalence and one model's performance were known.
 - **Test item mapping.** The 2017 alcohol questionnaire was redesigned, so the three alcohol
-  items are missing on the test and were imputed (this affects EBM / B only). Other 2017-2018
-  items keep their 2011-2016 names, and their codes were assumed unchanged without re-checking
-  every codebook.
+  items are missing on the test and were imputed (this affects EBM / B only). The 10 set-A
+  inputs were checked against the 2017-2018 codebooks after the test, and no difference was found
+  (see Results). The other set-B items keep their 2011-2016 names, and their codes were assumed
+  unchanged without re-checking every codebook.
 - **One test cycle, small subgroups.** 157 test positives; only one race/ethnicity group
   reaches 30, and the men-vs-women difference rests on 67 male positives.
 - **Label based on HbA1c only.** The main label is HbA1c ≥ 6.5 % from a single measurement, with
   no confirmatory test. HbA1c misses some cases that fasting glucose or an OGTT would find, and
   differs by race/ethnicity and with anaemia or haemoglobin variants. HbA1c-or-FPG on the
   fasting subsample is a sensitivity analysis only.
+
+## Earlier v1 design (superseded)
+
+The repository began as a v1 prototype. It is kept for the record and is **not** the v2 study
+above.
+- **Design:** NHANES 2011-2018 as one pool; XGBoost, PyTorch MLP and TabNet as the main models;
+  set A only; nested 5-fold CV; a temporal XGBoost run on 2017-2018.
+- **That temporal run:** it predates the plan (see caveat 1 in the summary). Its result is in
+  `results/temporal_test.csv` (commit `df1b305`).
+- **Not done:** BRFSS external validation was planned in v1 but never run (future work).
+- **The app in `src/app/` is a v1 prototype:**
+  - The FastAPI service and the Streamlit dashboard load `models/pipeline.joblib`, which no v2
+    script writes, so as committed they report that no model is loaded.
+  - The dashboard also uses a tree explainer that does not fit the v2 logistic regression.
+  - For v2 scoring, use `scripts/demo.py`.
+
+v1 commands, kept as a record:
+
+```bash
+python scripts/run_experiment.py --config configs/config.yaml --n-iter 5     # v1 nested CV, set A
+python scripts/run_experiment.py --models logreg,ada_style --strategies none --n-iter 5
+python scripts/summarize_dev_cv.py                                           # results/dev_cv_summary.csv
+python scripts/run_experiment.py --mode temporal --models xgboost --strategies none   # v1 temporal run
+uvicorn src.app.api:app --reload        # v1 prototype API (needs models/pipeline.joblib)
+streamlit run src/app/dashboard.py      # v1 prototype dashboard (tree models only)
+```
