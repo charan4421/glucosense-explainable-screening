@@ -1,5 +1,8 @@
 """Streamlit demo. Run: streamlit run src/app/dashboard.py
 
+v1 PROTOTYPE, not wired to the v2 study: no v2 script writes models/pipeline.joblib, and the
+TreeExplainer below does not fit the v2 logistic regression. For v2 scoring use scripts/demo.py.
+
 Loads models/pipeline.joblib, predicts risk, and draws a local SHAP waterfall for the entered patient.
 """
 from pathlib import Path

@@ -1,5 +1,8 @@
 """Async FastAPI service with Pydantic input validation.
 
+v1 PROTOTYPE, not wired to the v2 study: no v2 script writes models/pipeline.joblib. For v2
+scoring use scripts/demo.py (README, "Earlier v1 design").
+
 Run: uvicorn src.app.api:app --reload
 Expects a fitted pipeline saved with joblib at models/pipeline.joblib (train it with your own script).
 """
