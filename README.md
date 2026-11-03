@@ -313,6 +313,85 @@ range seen in training, or rewrite the patient's history.
 
 They show what the model responds to; they are not advice for any person.
 
+### Figures
+
+`scripts/dev_figures.py` makes these from development data only (2011-2016); 2017-2018 is never
+loaded. **All of these explain how the model uses its inputs. None of them shows cause and effect:**
+an input with a large bar is one the model leans on, not necessarily one that causes diabetes, and
+changing it in a real person may not change their risk.
+
+**Global SHAP, primary model (logistic regression / set A).** These are held-out explanations of
+the 204 sampled patients, each explained by the outer-fold model that did not train on them.
+
+![SHAP bar, logistic regression / A](docs/figures/shap_bar_logreg__none__A.png)
+
+*The average size of each input's effect on the predicted risk. Waist matters most, then age,
+race/ethnicity and family history. Smoking and diastolic BP barely move the prediction.*
+
+![SHAP beeswarm, logistic regression / A](docs/figures/shap_beeswarm_logreg__none__A.png)
+
+*Each dot is one patient. Right of zero means the input raised that patient's predicted risk; red
+means a high value of the input.*
+- A larger waist, older age, a family history and higher systolic BP push risk up.
+- With waist held fixed, a greater height and a higher BMI push it slightly down. These inputs are
+  strongly linked to waist, so this is how the model splits their shared signal, not a protective
+  effect.
+- For race/ethnicity, sex, family history and smoking the colour is just a category code, not
+  "high" or "low".
+
+**Global SHAP, secondary model (EBM / set B, 40 inputs).**
+
+![SHAP bar, EBM / B](docs/figures/shap_bar_ebm__none__B.png)
+
+![SHAP beeswarm, EBM / B](docs/figures/shap_beeswarm_ebm__none__B.png)
+
+*EBM spreads its effect over many inputs. Waist, family history, sex, age, systolic BP and BMI
+lead, and the 26 inputs not shown add up to more than any single one. The ranking is less stable
+across folds than for the primary model (see the table above).*
+
+**EBM's own feature importance.** This is from the frozen EBM / B, refit on all of 2011-2016.
+
+![EBM term importance](docs/figures/ebm_term_importance.png)
+
+*EBM's built-in measure: the average absolute contribution of each term, on the log-odds scale.
+EBM sees the four derived terms (age × BMI, waist/height, pulse pressure, BMI/age), so they appear
+here, while the SHAP plots group everything back into the original inputs. Both views put body
+size, sex and family history near the top.*
+
+**One patient: SHAP vs LIME.** This is the fictional sample patient (`examples/sample_patient.json`:
+58-year-old man, BMI 32.5, waist 110 cm, BP 138/84, family history yes) under the frozen primary
+model. The predicted risk is 4.7 %, against an average of 4.0 % over 100 development rows.
+
+![SHAP waterfall vs LIME, sample patient](docs/figures/local_shap_vs_lime_sample_patient.png)
+
+*Left, SHAP: how each input moves this patient's risk away from the average. Right, LIME: the
+weights of a simple model fitted around this patient.*
+- **Where they agree:** family history, age, male sex and systolic BP raise his risk; his
+  race/ethnicity (non-Hispanic White, code 3) and his height lower it. That race/ethnicity effect
+  is relative to the other groups in the training data; it is not biological.
+- **Where they differ:** LIME gives waist far more weight than SHAP does (+0.060 vs +0.006). LIME
+  compares broad bins of each input, while SHAP compares against real background patients, so
+  local explanations can disagree even for a simple model.
+
+**One patient: DiCE counterfactuals** (`docs/figures/dice_sample_patient.csv`). These are input
+changes that would bring the same patient's predicted risk below 3 %. Age, sex, height,
+race/ethnicity, family history and smoking were held fixed; blank cells are unchanged.
+
+| Input | Original | Counterfactual 1 | Counterfactual 2 | Counterfactual 3 |
+|---|---|---|---|---|
+| BMI | 32.5 | | **30.6** | **37.8** |
+| Waist (cm) | 110 | | **85.8** | **98.4** |
+| Systolic BP (mmHg) | 138 | **69.8** | | |
+| Diastolic BP, age, sex, height, family history, smoker, race/ethnicity | unchanged | | | |
+| **Predicted risk** | **4.7 %** | 2.0 % | 1.5 % | 2.6 % |
+| Within the training 1st-99th percentile? | | **No** (systolic 92.7-178) | Yes | Yes |
+| Realistic? | | **No:** a systolic of 70 is hypotension, not a goal | **No:** 24 cm off the waist for only 2 BMI units | **No:** BMI rises by 5 while the waist shrinks by 12 cm |
+
+*None of the three is realistic, although two pass the range check. DiCE changes inputs
+independently, so it can pair values that don't occur together in one body. This is why the
+range check overstates plausibility (37 % in the summary above). Counterfactuals show what the
+model is sensitive to; they are not a plan for any patient.*
+
 ## Notes on honesty
 
 - Counterfactuals are model explanations, not causal advice.
