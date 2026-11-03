@@ -139,7 +139,7 @@ tests/              synthetic-data tests (no downloads needed)
 
 Pre-specified in `docs/analysis_plan.md` (section 9 and the deviations). The test was scored
 **once** from the commit tagged `pre-test` (`6795066`); its results are in
-`results/test_2017_2018/` (commit `befb8b1`), with every hash in `run_log.json`. The primary
+`results/test_2017_2018/` (commit `5b3b20e`), with every hash in `run_log.json`. The primary
 model is L2 logistic regression on set A (10 inputs, one-hot categoricals), refit on all of
 2011-2016 (C = 0.3) and **not recalibrated**.
 
