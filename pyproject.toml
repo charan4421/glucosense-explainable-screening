@@ -8,3 +8,4 @@ ignore = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]                  # so tests import src/ and scripts/ under plain `pytest`
